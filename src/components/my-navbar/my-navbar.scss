@@ -1,0 +1,11 @@
+.navbar {
+  .navbar-brand:hover {
+    cursor: pointer;
+    opacity: 0.8;
+    transition: 0.2s;
+  }
+
+  .nav-link {
+    font-size: 0.8rem;
+  }
+}

@@ -12,8 +12,12 @@ $btn-color2: #f8f9fa;
   background-color: $btn-color1;
   color: $btn-color2;
 
-  &:hover {
+  &:hover:enabled {
     background-color: $btn-color2;
     color: $btn-color1;
+  }
+
+  &:disabled{
+    opacity: 0.5;
   }
 }

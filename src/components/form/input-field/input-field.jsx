@@ -1,35 +1,69 @@
 import React from "react";
 
-// Styles
-import Form from "react-bootstrap/Form";
 import "./input-field.scss";
 
 const InputField = ({
   label,
   name,
-  value = "",
+  value,
   type,
   handleChange,
   handleBlur,
-  touched,
+  required,
   errors,
 }) => {
   return (
-    <Form.Group controlId={name} className="input-field">
-      <Form.Control
+    <div controlid={name} className="form-group input-shrink-animation">
+      <input
         value={value}
+        className={`form-control`}
         name={name}
         type={type}
         onChange={handleChange}
         onBlur={handleBlur}
+        required={required}
+        form="formNoValidate"
       />
-      <Form.Label className={`${value.length && "shrink"}`}>{label}</Form.Label>
+      <label className={`form-label ${value.length && "shrink"}`}>{label}</label>
 
-      {touched && errors && (
-        <small className={`text-danger ml-1 ${errors ? "appear" : ""}`}>{errors}</small>
-      )}
-    </Form.Group>
+      {errors && <small className={`text-danger ml-1 ${errors ? "appear" : ""}`}>{errors}</small>}
+    </div>
   );
 };
 
 export default InputField;
+
+// import React from "react";
+
+// import "./input-field.scss";
+
+// const InputField = ({
+//   label,
+//   name,
+//   value = "",
+//   type,
+//   handleChange,
+//   handleBlur,
+//   touched,
+//   errors,
+// }) => {
+//   return (
+//     <div controlId={name} className="form-group input-shrink-animation">
+//       <input
+//         className="form-control"
+//         value={value}
+//         name={name}
+//         type={type}
+//         onChange={handleChange}
+//         onBlur={handleBlur}
+//       />
+//       <label className={`form-label ${value.length && "shrink"}`}>{label}</label>
+
+//       {touched && errors && (
+//         <small className={`text-danger ml-1 ${errors ? "appear" : ""}`}>{errors}</small>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default InputField;

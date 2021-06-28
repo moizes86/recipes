@@ -1,0 +1,13 @@
+@import "../../../../settings.scss";
+
+.recipe-form-items {
+  span {
+    margin-right: 10px;
+  }
+
+  .remove-item {
+    &:hover {
+      @include my-hover();
+    }
+  }
+}

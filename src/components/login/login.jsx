@@ -1,84 +1,90 @@
 import React, { useState } from "react";
 
+
+import { validateData, login } from "../../DAL/api";
+
 // Redux
-import { useDispatch } from "react-redux";
-import { onLogin } from "../../redux/user/user.actions";
+import {onLogin} from '../../redux/user/user.actions';
+import {useDispatch} from 'react-redux';
 
-// Formik Yup
-import { useFormik } from "formik";
-import * as Yup from "yup";
+// Routing
+import {useHistory} from 'react-router-dom';
 
+// Components
 import InputField from "../form/input-field/input-field";
-
-import DAL from "../../DAL/api";
-
-// Styles
-import Form from "react-bootstrap/Form";
 import CustomButton from "../custom-button/custom-button";
-import MyModal from "../my-modal/my-modal";
-import Signup from "../signup/signup";
 
 const Login = () => {
   const dispatch = useDispatch();
+  const history = useHistory();
+  
+  const [values, setValues] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [errors, setErrors] = useState({
+    email: null,
+    password: null,
+  });
+
   const [loginError, setLoginError] = useState(null);
 
-  const SignupSchema = Yup.object().shape({
-    email: Yup.string().email("Invalid email").required("Required"),
+  const handleBlur = ({ target: { name, value } }) => {
+    const error = validateData(name, value);
+    setErrors({ ...errors, [name]: error });
+  };
 
-    password: Yup.string()
-      .required("Required")
-      .matches(/^(?=.*[0-9])(?=.*[a-zA-Z]).{6,}$/, "Minimus six letters and numbers"),
-  });
+  const handleChange = ({ target: { name, value } }) => {
+    setValues({ ...values, [name]: value });
+  };
 
-  const formik = useFormik({
-    initialValues: {
-      email: "",
-      password: "",
-    },
-    validateOnChange: false,
-    validationSchema: SignupSchema,
-    onSubmit: (values) => {
-      const { res, errorMessage } = DAL.userExists(values);
-      if (!res) {
-        setLoginError(errorMessage);
-      } else {
-        dispatch(onLogin(res));
-      }
-    },
-  });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const loginResponse = await login({ ...values });
+    if (loginResponse.status === true) {
+      setLoginError(false);
+      dispatch(onLogin(loginResponse.body));
+      history.push('/');
+    } else {
+      setLoginError(loginResponse.message);
+    }
+  };
 
   return (
-    <Form onSubmit={formik.handleSubmit}>
+    <form onSubmit={handleSubmit}>
       <InputField
         label="Email"
-        value={formik.values.email}
         name="email"
         type="email"
-        handleChange={formik.handleChange}
-        handleBlur={formik.handleBlur}
-        touched={formik.touched.email}
-        errors={formik.errors.email}
+        value={values.email}
+        handleChange={handleChange}
+        handleBlur={handleBlur}
+        required={true}
+        errors={errors.email}
       />
 
       <InputField
         label="Password"
-        value={formik.values.password}
         name="password"
         type="password"
-        handleChange={formik.handleChange}
-        handleBlur={formik.handleBlur}
-        touched={formik.touched.password}
-        errors={formik.errors.password}
+        value={values.password}
+        handleChange={handleChange}
+        handleBlur={handleBlur}
+        required={true}
+        errors={errors.password}
       />
 
-      <CustomButton type='submit'>Login</CustomButton>
+      <CustomButton
+        disabled={!Object.values(errors).every((el) => el === false)}
+      >
+        Login
+      </CustomButton>
 
       <br />
 
       {loginError && <small>{loginError}</small>}
-
-      <MyModal childComponent={Signup}/>
-    </Form>
+    </form>
   );
 };
 export default Login;

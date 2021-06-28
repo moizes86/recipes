@@ -2,16 +2,16 @@
   background-color: rgba(0, 0, 0, 0.5);
 
   .modal-dialog {
-      max-width: 350px;
-      margin-top:15%;
-      
-      .modal-content {
-        background-color: rgba(255, 255, 255, 0.897);
+    max-width: 350px;
+    margin-top: 85px;
+
+    .modal-content {
+      background-color: rgba(255, 255, 255, 0.897);
       padding: 30px;
       padding-top: inherit;
       .modal-header {
-        padding-right:0;
-        padding-left:0;
+        padding-right: 0;
+        padding-left: 0;
       }
     }
   }

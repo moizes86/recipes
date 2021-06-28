@@ -1,20 +1,19 @@
 import React from "react";
-import { Field } from "formik";
+import "./input-checkbox.scss";
 
-const InputCheckbox = ({categoriesChecked}) => {
-  const categories = ["Vgean", "Kosher", "Breakfast", "Lunch", "Dinner"];
+const InputCheckbox = ({ name, items, handleSelect, itemsSelected=[], title }) => {
   return (
-    <>
-      <div id="checkbox-group">Checked</div>
+    <div className='input-checkbox  ml-1 '>
+      <div id="checkbox-group" >{title}</div>
       <div role="group" aria-labelledby="checkbox-group">
-        {categories.map((category, i) => (
-          <label>
-            <input type="checkbox" name="categories" value={category} key={`${category}-${i}`} checked={categoriesChecked.includes(category)}/>
-            {category}
+        {items.map((item, i) => (
+          <label className="mr-3 mt-2" key={`${item}-${i}`}>
+            <input className="mr-2" type="checkbox" name={name?? item} value={item}  onChange={handleSelect} checked={itemsSelected.includes(item)}/>
+            {item}
           </label>
         ))}
       </div>
-    </>
+    </div>
   );
 };
 

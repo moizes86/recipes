@@ -8,8 +8,11 @@ $break_lg: "(min-width:992px)";
 $color1: #f7f7f7;
 $color2:#292b2c;
 
-// $fontFamily:
+$sub-color: grey;
+$main-color: black;
 
-.smaller-font{
-    font-size: 0.8rem;
+@mixin my-hover {
+     cursor: pointer;
+      opacity: 0.6;
+      transition: 0.2s;
 }

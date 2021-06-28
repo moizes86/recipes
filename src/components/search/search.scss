@@ -1,15 +1,11 @@
-@import '../../settings.scss';
+@import "../../settings.scss";
 
-.input-search{
-    width: 100%;
-    background-color: transparent;
-    border: none;
-    border-bottom: 1px solid $color1;
-    color:$color2;
-    padding: 8px 5px 5px 18px;
-    font-size: 1.2rem;
-    // color: whitesmoke;
-    transition: 0.3s;
-    // font-family: $fontFamily;
+.search-recipe {
+  width: 320px;
 
+  .radios {
+    label {
+      margin-left: 5px;
+    }
+  }
 }

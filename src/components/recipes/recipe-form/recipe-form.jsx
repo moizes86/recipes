@@ -4,6 +4,7 @@ import { addRecipe } from "../../../DAL/api";
 
 // Components
 import InputCheckbox from "../../form/input-checkbox/input-checkbox";
+import InputField from "../../form/input-field/input-field";
 import RecipeFormItems from "./recipe-form-items/recipe-form-items";
 
 import "./recipe-form.scss";
@@ -19,9 +20,9 @@ const RecipeForm = () => {
     ingredients: [],
     instructions: [],
     quantity: undefined,
-    unit: undefined,
+    unit: "DEFAULT",
     note: undefined,
-    instruction: undefined
+    instruction: undefined,
   });
 
   const [errors, setErrors] = useState({
@@ -36,10 +37,11 @@ const RecipeForm = () => {
 
   const handleSelect = ({ target: { name, value, checked } }) => {
     if (checked) {
-      setValues({ ...values, [name]: values[name].concat([value]) });
+      values[name].push(value);
     } else {
-      setValues({ ...values, [name]: values[name].filter((item) => item !== value) });
+      values[name] = values[name].filter((item) => item !== value);
     }
+    setValues({ ...values });
   };
 
   const addIngredient = (e) => {
@@ -47,25 +49,24 @@ const RecipeForm = () => {
     const { quantity, unit, note } = values; // deconstract values
     if (quantity && unit && note) {
       values.ingredients.push({ quantity, unit, note }); // add item
-      setValues({ ...values, quantity: "", unit: "", note: "" }); // set state
+      setValues({ ...values, quantity: "", unit: "DEFAULT", note: "" }); // set state
       if (errors.ingredients) setErrors({ ...errors, ingredients: null }); // remove errors if any
     } else {
       setErrors({ ...errors, ingredients: "All fields are required" });
     }
   };
 
-  const addInstruction = e => {
+  const addInstruction = (e) => {
     e.preventDefault();
-    const {instruction} = values;
-    if(instruction){
+    const { instruction } = values;
+    if (instruction) {
       values.instructions.push(instruction);
-      console.log(values.instructions);
-      setValues({...values})
-      if(errors.instructions) setErrors({...errors, instrcutions:null})
-    } else{
-      setErrors({...errors, instructions: "Required"})
+      setValues({ ...values });
+      if (errors.instructions) setErrors({ ...errors, instructions: null });
+    } else {
+      setErrors({ ...errors, instructions: "Required" });
     }
-  }
+  };
 
   const removeItem = ({ target: { title, id } }) => {
     values[title].splice(id, 1);
@@ -81,11 +82,10 @@ const RecipeForm = () => {
       });
       return false;
     }
-    if (!values.instrcutions.length) {
+    if (!values.instructions.length) {
       setErrors({
         ...errors,
-        instrcutions: "At least one instruction is required",
-        general: "Please complete all required fields",
+        instructions: "At least one instruction is required",
       });
       return false;
     }
@@ -94,15 +94,16 @@ const RecipeForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log(values);
     if (checkErrors()) addRecipe(values);
   };
 
   return (
     <form className="recipe-form " onSubmit={handleSubmit}>
       <div className="form-row">
-        <div className="form-group col col-md-6" controlid="recipeName">
-          <label htmlFor="recipeName" className="ml-1 form-label ">
-            *Recipe Name:
+        {/* <div className="form-group col col-md-6" controlid="recipeName">
+          <label htmlFor="recipeName" className="ml-1 form-label font-bolder">
+            * Recipe Name:
           </label>
           <input
             type="text"
@@ -113,10 +114,23 @@ const RecipeForm = () => {
             required
             onChange={handleChange}
           />
-        </div>
+        </div> */}
 
-        <div className="form-group col col-md-6" controlid="recipeSource">
-          <label htmlFor="recipeSource" className="ml-1 form-label">
+        <InputField
+          label="* Recipe name"
+          name="name"
+          type="text"
+          placeholder="Enter recipe name"
+          value={values.name}
+          required={true}
+          shrinkLabel={false}
+          classes="font-bolder pl-0"
+          cols="col col-md-6"
+          handleChange={handleChange}
+        />
+
+        {/* <div className="form-group col col-md-6" controlid="recipeSource">
+          <label htmlFor="recipeSource" className="ml-1 form-label font-bolder">
             Source:
           </label>
           <input
@@ -127,11 +141,24 @@ const RecipeForm = () => {
             placeholder="Enter recipe source"
             onChange={handleChange}
           />
-        </div>
+        </div> */}
+
+        <InputField
+          label="Source"
+          name="source"
+          type="text"
+          placeholder="Enter link to recipe source"
+          value={values.sourceURL}
+          required={false}
+          shrinkLabel={false}
+          classes="font-bolder  pl-0"
+          cols="col-12 col-md-6"
+          handleChange={handleChange}
+        />
       </div>
 
-      <div className="form-group flex-grow-1" controlid="recipeSourceURL">
-        <label htmlFor="recipeSourceURL" className="ml-1 form-label">
+      {/* <div className="form-group flex-grow-1" controlid="recipeSourceURL">
+        <label htmlFor="recipeSourceURL" className="ml-1 form-label font-bolder">
           Link To Source:
         </label>
         <input
@@ -142,7 +169,19 @@ const RecipeForm = () => {
           placeholder="Enter link to original recipe source"
           onChange={handleChange}
         />
-      </div>
+      </div> */}
+
+      <InputField
+        label="Link To Source"
+        name="source"
+        type="text"
+        placeholder="Enter recipe source"
+        value={values.source}
+        required={false}
+        shrinkLabel={false}
+        classes="font-bolder col col-md-6 pl-0"
+        handleChange={handleChange}
+      />
 
       <div className="input-file input-group my-4">
         <div className="custom-file">
@@ -153,8 +192,8 @@ const RecipeForm = () => {
 
       {/* Description */}
       <div className="form-group">
-        <label className="form-label " htmlFor="description">
-          *General description, will be presented below the title
+        <label className="form-label font-bolder" htmlFor="description">
+          * General description, will be presented below the title
         </label>
         <textarea
           className="form-control "
@@ -185,7 +224,7 @@ const RecipeForm = () => {
 
       {/************* Ingredients *************/}
       <div className="ingredients my-4">
-        <p className="">Ingredients:</p>
+        <p className="font-bolder">* Ingredients:</p>
         <div className=" d-flex font-smaller">
           <div className="form-group mr-2 narrow " controlid="quantity">
             <label className="form-label ">Amount</label>
@@ -201,15 +240,15 @@ const RecipeForm = () => {
           </div>
 
           <div className="form-group mr-2 narrow" controlid="measurement">
-            <label className="form-label "> Units</label>
+            <label className="form-label font-bolder"> Units</label>
             <select
-              className="form-control"
-              as="select"
+              className="form-control font-bolder"
               value={values.unit}
+              defaultValue="DEFAULT"
               name="unit"
               onChange={handleChange}
             >
-              <option disabled selected value>
+              <option disabled value="DEFAULT">
                 --
               </option>
               <option>g</option>
@@ -219,7 +258,7 @@ const RecipeForm = () => {
           </div>
 
           <div className="form-group flex-grow-1" controlid="note">
-            <label htmlFor="note " className="form-label ">
+            <label htmlFor="note" className="form-label font-bolder">
               Notes:
             </label>
             <input
@@ -246,7 +285,7 @@ const RecipeForm = () => {
 
       {/************* Instructions *************/}
       <div className="instructions my-4">
-        <label className="form-label font-bolder">Instructions:</label>
+        <label className="form-label font-bolder">* Instructions:</label>
         <div className="form-group d-flex" controlid="instruction">
           <input
             type="text"
@@ -256,21 +295,17 @@ const RecipeForm = () => {
             placeholder="What should be done next"
             onChange={handleChange}
           />
-          </div>
-          <RecipeFormItems
-            title="instructions"
-            items={values.instructions}
-            removeItem={removeItem}
-          />
+        </div>
+        <RecipeFormItems title="instructions" items={values.instructions} removeItem={removeItem} />
 
-          <button className="btn btn-primary ml-3" onClick={addInstruction}>
-            Save
-          </button>
+        <button className="btn btn-primary mr-4" onClick={addInstruction}>
+          Add
+        </button>
 
-          <small>{errors.instructions}</small>
+        <small>{errors.instructions}</small>
       </div>
 
-      <button className="btn btn-primary" type="submit">
+      <button className="btn btn-primary mt-3" type="submit">
         Add Recipe
       </button>
     </form>

@@ -18,7 +18,7 @@ const MyNavbar = () => {
   const activeUser = useSelector((state) => state.user.activeUser);
 
   return (
-    <nav className="my-navbar navbar navbar-expand-md navbar-light bg-dark mb-md-5">
+    <nav className="my-navbar navbar navbar-expand-md navbar-light bg-dark mb-5">
       <div className="container ">
         <span className="navbar-brand text-light mr-4" onClick={() => history.push("/")}>
           Recipes

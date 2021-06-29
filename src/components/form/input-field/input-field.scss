@@ -1,3 +1,55 @@
+// @import "../../../settings.scss";
+
+// input:-webkit-autofill,
+// input:-webkit-autofill:hover,
+// input:-webkit-autofill:focus,
+// input:-webkit-autofill:active {
+//   transition: background-color 5000s ease-in-out 0s;
+// }
+
+// @mixin shrinkLabel {
+//   top: -18px;
+//   font-size: 12px;
+//   color: $main-color;
+// }
+
+// .smaller-font {
+//   font-size: 0.8rem;
+// }
+
+// .input-shrink-animation {
+//   position: relative;
+//   margin: 40px 0;
+
+//   .form-control {
+//     color: $sub-color;
+
+//     &:focus ~ .form-label {
+//       @include shrinkLabel();
+//     }
+//   }
+
+//   .form-label {
+//     color: $sub-color;
+//     font-size: 16px;
+//     font-weight: normal;
+//     position: absolute;
+//     pointer-events: none;
+//     left: 11px;
+//     top: 8px;
+//     transition: 300ms ease all;
+
+//     &.shrink {
+//       @include shrinkLabel();
+//     }
+//   }
+
+//   small {
+//     position: absolute;
+//     top: 40px;
+//   }
+// }
+
 @import "../../../settings.scss";
 
 input:-webkit-autofill,
@@ -17,16 +69,12 @@ input:-webkit-autofill:active {
   font-size: 0.8rem;
 }
 
-.input-shrink-animation {
+.parent-for-input-shrink {
   position: relative;
   margin: 40px 0;
 
   .form-control {
     color: $sub-color;
-
-    &:focus ~ .form-label {
-      @include shrinkLabel();
-    }
   }
 
   .form-label {
@@ -39,11 +87,11 @@ input:-webkit-autofill:active {
     top: 8px;
     transition: 300ms ease all;
 
-    &.shrink {
-      @include shrinkLabel();
-    }
   }
-
+  
+  .shrink {
+    @include shrinkLabel();
+  }
   small {
     position: absolute;
     top: 40px;

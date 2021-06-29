@@ -30,13 +30,11 @@
     width: 70px !important;
   }
 
-  .font-smaller {
-    font-size: 0.8rem;
+  .font-bolder {
+    @include font-bolder;
   }
 
-  .form-group > label,
-  .ingredients > p,
-  .font-bolder {
-    font-weight: 500;
+  .font-smaller {
+    @include font-smaller;
   }
 }

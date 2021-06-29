@@ -1,38 +1,3 @@
-import React from "react";
-
-import "./input-field.scss";
-
-const InputField = ({
-  label,
-  name,
-  value,
-  type,
-  handleChange,
-  handleBlur,
-  required,
-  errors,
-}) => {
-  return (
-    <div controlid={name} className="form-group input-shrink-animation">
-      <input
-        value={value}
-        className={`form-control`}
-        name={name}
-        type={type}
-        onChange={handleChange}
-        onBlur={handleBlur}
-        required={required}
-        form="formNoValidate"
-      />
-      <label className={`form-label ${value.length && "shrink"}`}>{label}</label>
-
-      {errors && <small className={`text-danger ml-1 ${errors ? "appear" : ""}`}>{errors}</small>}
-    </div>
-  );
-};
-
-export default InputField;
-
 // import React from "react";
 
 // import "./input-field.scss";
@@ -40,30 +5,81 @@ export default InputField;
 // const InputField = ({
 //   label,
 //   name,
-//   value = "",
+//   value,
 //   type,
 //   handleChange,
 //   handleBlur,
-//   touched,
+//   required,
 //   errors,
+//   shrinkLabel = true
 // }) => {
 //   return (
-//     <div controlId={name} className="form-group input-shrink-animation">
+//     <div controlid={name} className="form-group input-shrink-animation">
 //       <input
-//         className="form-control"
 //         value={value}
+//         className={`form-control`}
 //         name={name}
 //         type={type}
 //         onChange={handleChange}
 //         onBlur={handleBlur}
+//         required={required}
 //       />
-//       <label className={`form-label ${value.length && "shrink"}`}>{label}</label>
+//       <label className={`form-label ${shrinkLabel&& value.length && "shrink"}`}>{label}</label>
 
-//       {touched && errors && (
-//         <small className={`text-danger ml-1 ${errors ? "appear" : ""}`}>{errors}</small>
-//       )}
+//       {errors && <small className={`text-danger ml-1 ${errors ? "appear" : ""}`}>{errors}</small>}
 //     </div>
 //   );
 // };
 
 // export default InputField;
+
+import React, { useState } from "react";
+
+import "./input-field.scss";
+
+const InputField = ({
+  label,
+  name,
+  type,
+  placeholder,
+  value,
+  required,
+  shrinkLabel = true,
+  classes,
+  cols,
+  errors,
+  handleChange,
+  handleBlur,
+}) => {
+  const [inputFocused, setInputFocused] = useState(false);
+  return (
+    <div controlid={name} className={`form-group flex-grow-1  ${shrinkLabel ? "parent-for-input-shrink" : cols}`}>
+      <label
+        className={`form-label ${
+          shrinkLabel ? (inputFocused || value.length) && "shrink" : classes
+        }`}
+      >
+        {label}
+      </label>
+      <input
+        value={value}
+        className={`form-control`}
+        name={name}
+        id={name}
+        type={type}
+        onChange={handleChange}
+        onBlur={(e) => {
+          handleBlur && handleBlur(e);
+          setInputFocused(false);
+        }}
+        placeholder={placeholder}
+        required={required}
+        onFocus={() => setInputFocused(true)}
+      />
+
+      {errors && <small className={`text-danger ml-1 ${errors ? "appear" : ""}`}>{errors}</small>}
+    </div>
+  );
+};
+
+export default InputField;

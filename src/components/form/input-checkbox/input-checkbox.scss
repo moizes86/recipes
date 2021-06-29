@@ -1,7 +1,11 @@
 @import "../../../settings.scss";
 
-.input-checkbox{
-    label{
-        font-size: 0.9rem;
-    }
+.input-checkbox {
+  label {
+    font-size: 0.9rem;
+  }
+
+  .font-bolder {
+    @include font-bolder;
+  }
 }

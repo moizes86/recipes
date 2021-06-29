@@ -16,3 +16,11 @@ $main-color: black;
       opacity: 0.6;
       transition: 0.2s;
 }
+
+@mixin font-smaller{
+      font-size: 0.8rem;;
+}
+
+@mixin font-bolder{
+      font-weight: 500;
+}

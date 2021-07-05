@@ -1,6 +1,7 @@
 const express = require("express");
 const { signup, login, updateDetails } = require("../db");
 const router = express.Router();
+const {validateInput} = require( '../../validations');
 
 /* GET users listing. */
 router.get("/", function (req, res, next) {
@@ -10,7 +11,12 @@ router.get("/", function (req, res, next) {
 /* POST user signup */
 router.post("/signup", async (req, res) => {
   try {
-    const { email, username, password } = req.body;
+    const { email, username, password, confirmPassword } = req.body;
+     validateInput('email', email);
+     validateInput('username', username);
+     validateInput('password', password);
+     validateInput("confirmPassword", confirmPassword, password);
+
 
     const result = await signup(email, username, password);
     res.status(200).json(result);

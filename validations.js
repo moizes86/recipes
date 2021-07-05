@@ -22,23 +22,21 @@ const validations = {
   },
 };
 
-export const validateInput = ({ name, value, password }) => {
-  const newErrors = [];
+ const validateInput = (name, value, password) => {
   const { required, pattern, shouldConfirmPassword } = validations[name];
 
   if (required && !value) {
-    newErrors.push(`Field is required`);
+    throw Error(`${name} is required`);
   }
 
   if (pattern && !pattern.test(value)) {
-    newErrors.push(`Invalid ${name}`);
+    throw Error(`Invalid ${name}`);
   }
 
   if (shouldConfirmPassword && password !== value) {
-    newErrors.push("Passwords do not match");
+    throw Error ("Passwords do not match");
   }
 
-  return newErrors;
 };
 
-module.exports = validations;
+module.exports = {validateInput};

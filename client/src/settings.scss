@@ -1,0 +1,26 @@
+// Breakpoints
+
+$break_xs: "(max-width:576px)";
+$break_sm: "(min-width:576px) and (max-width: 768px)";
+$break_md: "(min-width:768px) and (max-width:992px)";
+$break_lg: "(min-width:992px)";
+
+$color1: #f7f7f7;
+$color2:#292b2c;
+
+$sub-color: grey;
+$main-color: black;
+
+@mixin my-hover {
+     cursor: pointer;
+      opacity: 0.6;
+      transition: 0.2s;
+}
+
+@mixin font-smaller{
+      font-size: 0.8rem;;
+}
+
+@mixin font-bolder{
+      font-weight: 500;
+}

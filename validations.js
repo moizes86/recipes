@@ -18,4 +18,3 @@
 };
 
 module.exports = {validateInput};
-console.log('bhbkv');

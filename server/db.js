@@ -31,7 +31,7 @@ const signup = async (email, username, password) => {
   });
 };
 
-const login = async (email,password) => {
+const login = async (email, password) => {
   return new Promise((resolve, reject) => {
     try {
       db.query(
@@ -46,7 +46,7 @@ const login = async (email,password) => {
       );
     } catch (e) {}
   });
-}
+};
 
 const updateDetails = async (id, username, password) => {
   return new Promise((resolve, reject) => {
@@ -65,28 +65,91 @@ const updateDetails = async (id, username, password) => {
   });
 };
 
-// const getRecipes = async()=>{
-//   return new Promise((resolve, reject)=>{
-//     try {
-//       db.query(
-//         `UPDATE recipesapp.users SET username = '${username}', password='${password}' WHERE id = ${id};`,
-//         (error, result, fields) => {
-//           if (error) {
-//             reject(error);
-//           } else {
-//             resolve(result);
-//           }
-//         }
-//       );
-//     } catch (e) {
+const getRecipes = async () => {
+  return new Promise((resolve, reject) => {
+    try {
+      db.query(`SELECT * FROM recipesapp.recipes;`, (error, result, fields) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result);
+        }
+      });
+    } catch (e) {}
+  });
+};
 
-//     })
-  
-  
+const getMeasuringUnits = async () => {
+  return new Promise((resolve, reject) => {
+    try {
+      db.query(`SELECT * FROM recipesapp.measuring_units;`, (error, result, fields) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result);
+        }
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
 
+const getDietTypes = async () => {
+  return new Promise((resolve, reject) => {
+    try {
+      db.query(`SELECT * FROM recipesapp.diets;`, (error, result, fields) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result);
+        }
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
 
-// db.signup = signup;
+const getMealTypes = async () => {
+  return new Promise((resolve, reject) => {
+    try {
+      db.query(`SELECT * FROM recipesapp.meals;`, (error, result, fields) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result);
+        }
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
 
-// module.exports = db;
+const getDifficultyLevels = async () => {
+  return new Promise((resolve, reject) => {
+    try {
+      db.query(`SELECT * FROM recipesapp.difficulty_levels;`, (error, result, fields) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result);
+        }
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
 
-module.exports = { signup, login, updateDetails };
+module.exports = {
+  signup,
+  login,
+  updateDetails,
+  getRecipes,
+  getMeasuringUnits,
+  getDietTypes,
+  getMealTypes,
+  getDifficultyLevels,
+};

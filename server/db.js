@@ -40,7 +40,7 @@ const login = async (email,password) => {
           if (error) {
             reject(error);
           } else {
-            resolve(result;
+            resolve(result);
           }
         }
       );

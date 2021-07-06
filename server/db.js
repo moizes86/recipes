@@ -31,16 +31,16 @@ const signup = async (email, username, password) => {
   });
 };
 
-const login = async (id,email,password) => {
+const login = async (email,password) => {
   return new Promise((resolve, reject) => {
     try {
       db.query(
-        `SELECT * FROM recipesapp.users WHERE (id='${id}') OR (email='${email}' AND password='${password}')`,
+        `SELECT * FROM recipesapp.users WHERE (email='${email}' AND password='${password}')`,
         (error, result, fields) => {
           if (error) {
             reject(error);
           } else {
-            resolve(result[0]);
+            resolve(result;
           }
         }
       );
@@ -64,6 +64,26 @@ const updateDetails = async (id, username, password) => {
     } catch (e) {}
   });
 };
+
+// const getRecipes = async()=>{
+//   return new Promise((resolve, reject)=>{
+//     try {
+//       db.query(
+//         `UPDATE recipesapp.users SET username = '${username}', password='${password}' WHERE id = ${id};`,
+//         (error, result, fields) => {
+//           if (error) {
+//             reject(error);
+//           } else {
+//             resolve(result);
+//           }
+//         }
+//       );
+//     } catch (e) {
+
+//     })
+  
+  
+
 
 // db.signup = signup;
 

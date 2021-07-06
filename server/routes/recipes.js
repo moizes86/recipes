@@ -1,5 +1,17 @@
 var express = require("express");
 var router = express.Router();
+const {
+  validateEmail,
+  validateRequired,
+  validateRecipeTitle,
+  validateSourceUrl,
+  validateYield,
+  validatePrepTime,
+  validateDifficultyLevel,
+  validateImage,
+  validateIngredients,
+  validateInstructions,
+} = require("../../validations");
 
 const {
   getRecipes,
@@ -7,6 +19,7 @@ const {
   getDietTypes,
   getMealTypes,
   getDifficultyLevels,
+  createRecipe,
 } = require("../db");
 
 router.get("/", async (req, res) => {
@@ -54,24 +67,62 @@ router.get("/difficulty-levels", async (req, res) => {
   }
 });
 
+router.post("/add-recipe", async (req, res) => {
+  try {
+    // Proccess req.body
+    let {
+      userId,
+      title,
+      description,
+      source,
+      sourceUrl,
+      yield,
+      prepTime,
+      difficultyLevel,
+      img,
+      dietTypes,
+      mealTypes,
+      ingredients,
+      instructions,
+    } = req.body;
+    userId = +userId;
+    yield = +yield;
+    prepTime = +prepTime;
+    difficultyLevel = +difficultyLevel;
+    ingredients = JSON.parse(ingredients);
+    instructions = JSON.parse(instructions);
+    // End proccess req.body
 
-router.post("/add-recipe", function (req, res) {
-  console.log(req.body);
+    // Validate values
+    validateRequired("UserId", userId);
+    validateRequired("Description", description);
+    validateRecipeTitle(title);
+    validateIngredients(ingredients);
+    validateInstructions(instructions);
+    if (sourceUrl) validateSourceUrl(sourceUrl);
+    if (yield) validateYield(yield);
+    if (prepTime) validatePrepTime(prepTime);
+    if (difficultyLevel) validateDifficultyLevel(difficultyLevel);
+    if (img) validateImage(img);
+    // End validate values
 
-  const { user_id, title, description, source, url, yield, prepTime, difficultyLevel } = req.body;
+    // Add to recipes table
+    const resultCreateRecipe = await createRecipe(
+      userId,
+      title,
+      description,
+      source,
+      sourceUrl,
+      yield,
+      prepTime,
+      difficultyLevel,
+      img
+    );
 
-  const addRecipe_query = `INSERT INTO recipesapp.recipes \
-                (user_id, title, description, source, url, yield, prep_time, difficulty) \
-                VALUES 
-                (${user_id}, '${title}', '${description}', '${source}', '${url}', ${+yield}, ${+prepTime}, ${difficultyLevel})`;
-
-  const addIngredients_query = `INSERT INTO recipesapp.ingredients (note, recipe_id, unit_id) 
-  VALUES ('${note}', ${recipe_id}, ${unit_id});
-`;
-  const addInstructions_query = ``;
-  const addMealTypes_query = ``;
-  const addDietTypes_query = ``;
-  const insertId = db._query(res, addRecipe_query);
+    res.status(200).send(resultCreateRecipe);
+  } catch (e) {
+    res.status(500).json({ err: e.message });
+  }
 });
 
 module.exports = router;

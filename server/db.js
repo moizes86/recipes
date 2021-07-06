@@ -8,7 +8,7 @@ const db = mysql.createConnection({
 });
 
 db.connect((error) => {
-  if (error) throw err;
+  if (error) throw Error(error);
   console.log("DB Connected!");
 });
 
@@ -16,7 +16,7 @@ const signup = async (email, username, password) => {
   return new Promise((resolve, reject) => {
     try {
       db.query(
-        `INSERT INTO users (username, email, password) VALUES 
+        `INSERT INTO recipesapp.users (username, email, password) VALUES 
       ('${username}','${email}','${password}')`,
         (error, result, fields) => {
           if (error) {
@@ -143,6 +143,44 @@ const getDifficultyLevels = async () => {
   });
 };
 
+const createRecipe = async (
+  userId,
+  title,
+  description,
+  source,
+  sourceUrl,
+  yield,
+  prepTime,
+  difficultyLevel,
+  img
+) => {
+  return new Promise((resolve, reject) => {
+    try {
+      db.query(
+        `INSERT INTO recipesapp.recipes ( 
+      user_id, title, description, source, source_url, yield, prep_time, difficulty, image_url
+      )
+      VALUES 
+      (${userId}, '${title}', '${description}', '${source}', '${sourceUrl}', ${yield}, ${prepTime}, ${difficultyLevel}, '${img}');`,
+
+        (error, result, fields) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(result);
+          }
+        }
+      );
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+// const addIngredients_query = `INSERT INTO recipesapp.ingredients (note, recipe_id, unit_id)
+//   VALUES ('${note}', ${recipe_id}, ${unit_id});
+// `;
+
 module.exports = {
   signup,
   login,
@@ -152,4 +190,5 @@ module.exports = {
   getDietTypes,
   getMealTypes,
   getDifficultyLevels,
+  createRecipe,
 };

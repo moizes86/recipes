@@ -3,9 +3,14 @@ var router = express.Router();
 
 const db = require("../db");
 
-router.get("/", function (req, res) {
-  const query = "SELECT * FROM recipesapp.recipes;";
-  return db._query(res, query);
+router.get("/", async (req, res) => {
+  try {
+    // const { id, email, password } = req.body;
+    const result = await login(id, email, password);
+    res.status(200).json(result);
+  } catch (e) {
+    res.status(500).json({ err: e.message });
+  }
 });
 
 router.get("/measuring-units", function (req, res) {

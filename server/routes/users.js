@@ -30,7 +30,12 @@ router.post("/signup", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const { id, email, password } = req.body;
-    const result = await login(id, email, password);
+
+    validateInput('email', email);
+    validateInput('password',password);
+
+    const result = await login(email, password);
+    if (!result.length) res.status(500).json({err: 'Username or password incorrect'})
     res.status(200).json(result);
   } catch (e) {
     res.status(500).json({ err: e.message });
@@ -40,7 +45,12 @@ router.post("/login", async (req, res) => {
 /* Update user's details */
 router.put("/update-details", async (req, res) => {
   try {
-    const { id, username, password } = req.body;
+    const { id, username, password,confirmPassword } = req.body;
+
+    validateInput("username", username);
+    validateInput("password", password);
+    validateInput("confirmPassword", confirmPassword, password);
+
     const result = await updateDetails(id, username, password);
     res.status(200).json(result);
   } catch (e) {

@@ -66,15 +66,14 @@ const validateImage = (image) => {
 const validateIngredients = (ingredients) => {
   if (!ingredients.length) throw Error("Ingredients are required");
   ingredients.forEach((ingredient) => {
-    if (!ingredient.note || !ingredient.recipeId || !ingredient.unitId)
-    throw Error("Invalid ingredient");
+    if (!ingredient.note || !ingredient.unitId) throw Error("Invalid ingredient");
   });
 };
 
 const validateInstructions = (instructions) => {
-  if (!instructions.length) throw Error("Ingredients are required");
+  if (!instructions.length) throw Error("Instructions are required");
   instructions.forEach((instruction) => {
-    if (!instruction.instruction || !instruction.recipeId) throw Error("Invalid instruction");
+    if (!instruction) throw Error("Invalid instruction");
   });
 };
 

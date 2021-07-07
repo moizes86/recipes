@@ -16,8 +16,8 @@ const signup = async (email, username, password) => {
   return new Promise((resolve, reject) => {
     try {
       db.query(
-        `INSERT INTO recipesapp.users (username, email, password) VALUES 
-      ('${username}','${email}','${password}')`,
+        "INSERT INTO recipesapp.users (email, username, password ) VALUES (?,?,?) ",
+        [email, username, password],
         (error, result, fields) => {
           if (error) {
             reject(error);
@@ -27,7 +27,9 @@ const signup = async (email, username, password) => {
           }
         }
       );
-    } catch (e) {}
+    } catch (e) {
+      reject(e);
+    }
   });
 };
 
@@ -35,7 +37,8 @@ const login = async (email, password) => {
   return new Promise((resolve, reject) => {
     try {
       db.query(
-        `SELECT * FROM recipesapp.users WHERE (email='${email}' AND password='${password}')`,
+        "SELECT * FROM recipesapp.users WHERE (email = ? AND password = ?)",
+        [email, password],
         (error, result, fields) => {
           if (error) {
             reject(error);
@@ -44,7 +47,9 @@ const login = async (email, password) => {
           }
         }
       );
-    } catch (e) {}
+    } catch (e) {
+      reject(e);
+    }
   });
 };
 
@@ -52,7 +57,8 @@ const updateDetails = async (id, username, password) => {
   return new Promise((resolve, reject) => {
     try {
       db.query(
-        `UPDATE recipesapp.users SET username = '${username}', password='${password}' WHERE id = ${id};`,
+        "UPDATE recipesapp.users SET username = ?, password= ? WHERE id = ?;",
+        [username, password, id],
         (error, result, fields) => {
           if (error) {
             reject(error);
@@ -61,7 +67,9 @@ const updateDetails = async (id, username, password) => {
           }
         }
       );
-    } catch (e) {}
+    } catch (e) {
+      reject(e);
+    }
   });
 };
 
@@ -75,7 +83,126 @@ const getRecipes = async () => {
           resolve(result);
         }
       });
-    } catch (e) {}
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+const getRecipe = async (recipeId) => {
+  return new Promise((resolve, reject) => {
+    try {
+      db.query(
+        "SELECT * FROM recipesapp.recipes\
+        WHERE (id = ?);",
+        [recipeId],
+        (error, result, fields) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(result);
+          }
+        }
+      );
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+const getIngredientsForRecipe = async (recipeId) => {
+  return new Promise((resolve, reject) => {
+    try {
+      db.query(
+        "SELECT i.note, i.amount, mu.unit \
+        FROM recipesapp.ingredients i \
+        JOIN recipesapp.measuring_units mu \
+        ON i.unit_id= mu.id AND i.recipe_id = ? \
+        WHERE i.unit_id = mu.id;",
+        [recipeId],
+        (error, result, fields) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(result);
+          }
+        }
+      );
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+const getInstructionsForRecipe = async (recipeId) => {
+  return new Promise((resolve, reject) => {
+    try {
+      db.query(
+        "SELECT instruction FROM recipesapp.instructions \
+        WHERE recipe_id = ? ;",
+        [recipeId],
+        (error, result, fields) => {
+          if (error) {
+            reject(error);
+          } else {
+            result = result.map((item) => item.instruction);
+            resolve(result);
+          }
+        }
+      );
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+const getDietsForRecipe = async (recipeId) => {
+  return new Promise((resolve, reject) => {
+    try {
+      db.query(
+        "SELECT d.title \
+        FROM recipesapp.diets d \
+        JOIN recipesapp.recipes_diets rd \
+        ON rd.diet_id = d.id \
+        WHERE rd.recipe_id= ? ;",
+        [recipeId],
+        (error, result, fields) => {
+          if (error) {
+            reject(error);
+          } else {
+            result = result.map((item) => item.title);
+            resolve(result);
+          }
+        }
+      );
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+const getCategoriesForRecipe = async (recipeId) => {
+  return new Promise((resolve, reject) => {
+    try {
+      db.query(
+        "SELECT c.title \
+        FROM recipesapp.categories c \
+        JOIN recipesapp.recipes_categories rc \
+        ON rc.category_id = c.id \
+        WHERE rc.recipe_id= ? ;",
+        [recipeId],
+        (error, result, fields) => {
+          if (error) {
+            reject(error);
+          } else {
+            result = result.map((item) => item.title);
+            resolve(result);
+          }
+        }
+      );
+    } catch (e) {
+      reject(e);
+    }
   });
 };
 
@@ -95,7 +222,7 @@ const getMeasuringUnits = async () => {
   });
 };
 
-const getDietTypes = async () => {
+const getDiets = async () => {
   return new Promise((resolve, reject) => {
     try {
       db.query(`SELECT * FROM recipesapp.diets;`, (error, result, fields) => {
@@ -111,10 +238,10 @@ const getDietTypes = async () => {
   });
 };
 
-const getMealTypes = async () => {
+const getCategories = async () => {
   return new Promise((resolve, reject) => {
     try {
-      db.query(`SELECT * FROM recipesapp.meals;`, (error, result, fields) => {
+      db.query(`SELECT * FROM recipesapp.categories;`, (error, result, fields) => {
         if (error) {
           reject(error);
         } else {
@@ -157,11 +284,10 @@ const createRecipe = async (
   return new Promise((resolve, reject) => {
     try {
       db.query(
-        `INSERT INTO recipesapp.recipes ( 
-      user_id, title, description, source, source_url, yield, prep_time, difficulty, image_url
-      )
-      VALUES 
-      (${userId}, '${title}', '${description}', '${source}', '${sourceUrl}', ${yield}, ${prepTime}, ${difficultyLevel}, '${img}');`,
+        "INSERT INTO recipesapp.recipes \
+        (user_id, title, description, source, source_url, yield, prep_time, difficulty, image_url)\
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);",
+        [userId, title, description, source, sourceUrl, yield, prepTime, difficultyLevel, img],
 
         (error, result, fields) => {
           if (error) {
@@ -177,18 +303,120 @@ const createRecipe = async (
   });
 };
 
-// const addIngredients_query = `INSERT INTO recipesapp.ingredients (note, recipe_id, unit_id)
-//   VALUES ('${note}', ${recipe_id}, ${unit_id});
-// `;
+const addIngredients = async (recipeId, ingredients) => {
+  return new Promise((resolve, reject) => {
+    try {
+      ingredients.forEach((ingredient) => {
+        const { note, amount, unitId } = ingredient;
+        db.query(
+          "INSERT INTO recipesapp.ingredients\
+         ( recipe_id, note , amount, unit_id)\
+          VALUES (?,?,?,?)",
+          [recipeId, note, amount, unitId],
+          (error, result, fields) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(result);
+            }
+          }
+        );
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+const addInstructions = async (recipeId, instructions) => {
+  return new Promise((resolve, reject) => {
+    try {
+      instructions.forEach((instruction) => {
+        db.query(
+          "INSERT INTO recipesapp.instructions\
+          (recipe_id, instruction)\
+          VALUES (?,?)",
+          [recipeId, instruction],
+          (error, result, fields) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(result);
+            }
+          }
+        );
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+const addDiets = async (recipeId, diets) => {
+  return new Promise((resolve, reject) => {
+    try {
+      diets.forEach((dietId) => {
+        db.query(
+          "INSERT INTO recipesapp.recipes_diets\
+          (recipe_id, diet_id)\
+          VALUES (?,?)",
+          [recipeId, dietId],
+          (error, result, fields) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(result);
+            }
+          }
+        );
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+const addCategories = async (recipeId, categories) => {
+  return new Promise((resolve, reject) => {
+    try {
+      categories.forEach((categoryId) => {
+        db.query(
+          "INSERT INTO recipesapp.recipes_categories\
+          (recipe_id, category_id)\
+          VALUES (?,?)",
+          [recipeId, categoryId],
+          (error, result, fields) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(result);
+            }
+          }
+        );
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
 
 module.exports = {
   signup,
   login,
   updateDetails,
   getRecipes,
+  getRecipe,
+  getIngredientsForRecipe,
+  getInstructionsForRecipe,
+  getDietsForRecipe,
+  getCategoriesForRecipe,
   getMeasuringUnits,
-  getDietTypes,
-  getMealTypes,
   getDifficultyLevels,
+  getDiets,
+  getCategories,
   createRecipe,
+  addIngredients,
+  addInstructions,
+  addDiets,
+  addCategories,
 };

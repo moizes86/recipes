@@ -1,38 +1,12 @@
 var express = require("express");
 var router = express.Router();
-const {
-  validateRequired,
-  validateRecipeTitle,
-  validateSourceUrl,
-  validateYield,
-  validatePrepTime,
-  validateDifficultyLevel,
-  validateImage,
-  validateIngredients,
-  validateInstructions,
-} = require("../../validations");
+const { validationsAPI } = require("../DAL/validations");
 
-const {
-  getRecipes,
-  getRecipe,
-  getIngredientsForRecipe,
-  getInstructionsForRecipe,
-  getDietsForRecipe,
-  getCategoriesForRecipe,
-  getMeasuringUnits,
-  getDifficultyLevels,
-  getDiets,
-  getCategories,
-  createRecipe,
-  addIngredients,
-  addInstructions,
-  addDiets,
-  addCategories,
-} = require("../db");
+const { recipesAPI } = require("../DAL/db");
 
 router.get("/", async (req, res) => {
   try {
-    const result = await getRecipes();
+    const [result] = await recipesAPI.getRecipes();
     res.status(200).json(result);
   } catch (e) {
     res.status(500).json({ err: e.message });
@@ -41,14 +15,14 @@ router.get("/", async (req, res) => {
 
 router.get("/recipe?:recipeId", async (req, res) => {
   try {
-    const {recipeId} = req.query;
-    const recipe = await getRecipe(recipeId);
-    const ingredients = await getIngredientsForRecipe(recipeId);
-    const instructions = await getInstructionsForRecipe(recipeId);
-    const diets = await getDietsForRecipe(recipeId);
-    const categories = await getCategoriesForRecipe(recipeId);
-    
-    res.status(200).json({recipe,ingredients, instructions, diets, categories});
+    const { recipeId } = req.query;
+    const recipe = await recipesAPI.getRecipe(recipeId);
+    const ingredients = await recipesAPI.getIngredientsForRecipe(recipeId);
+    const instructions = await recipesAPI.getInstructionsForRecipe(recipeId);
+    const diets = await recipesAPI.getDietsForRecipe(recipeId);
+    const categories = await recipesAPI.getCategoriesForRecipe(recipeId);
+
+    res.status(200).json({ recipe, ingredients, instructions, diets, categories });
   } catch (e) {
     res.status(500).json({ err: e.message });
   }
@@ -56,7 +30,7 @@ router.get("/recipe?:recipeId", async (req, res) => {
 
 router.get("/measuring-units", async (req, res) => {
   try {
-    const result = await getMeasuringUnits();
+    const [result] = await recipesAPI.getMeasuringUnits();
     res.status(200).json(result);
   } catch (e) {
     res.status(500).json({ err: e.message });
@@ -65,7 +39,7 @@ router.get("/measuring-units", async (req, res) => {
 
 router.get("/diets", async (req, res) => {
   try {
-    const result = await getDiets();
+    const [result] = await recipesAPI.getDiets();
     res.status(200).json(result);
   } catch (e) {
     res.status(500).json({ err: e.message });
@@ -74,7 +48,7 @@ router.get("/diets", async (req, res) => {
 
 router.get("/categories", async (req, res) => {
   try {
-    const result = await getCategories();
+    const [result] = await recipesAPI.getCategories();
     res.status(200).json(result);
   } catch (e) {
     res.status(500).json({ err: e.message });
@@ -83,7 +57,7 @@ router.get("/categories", async (req, res) => {
 
 router.get("/difficulty-levels", async (req, res) => {
   try {
-    const result = await getDifficultyLevels();
+    const [result] = await recipesAPI.getDifficultyLevels();
     res.status(200).json(result);
   } catch (e) {
     res.status(500).json({ err: e.message });
@@ -92,65 +66,59 @@ router.get("/difficulty-levels", async (req, res) => {
 
 router.post("/add-recipe", async (req, res) => {
   try {
-    // Proccess req.body
-    const {
+    let {
       userId,
       title,
       description,
       source,
-      sourceUrl,
+      url,
       yield,
       prepTime,
       difficultyLevel,
-      img,
+      image,
       diets,
       categories,
       ingredients,
       instructions,
-    } = req.body;
+    } = (req.body);
 
-    userId = +userId;
-    yield = +yield;
-    prepTime = +prepTime;
-    difficultyLevel = +difficultyLevel;
-    ingredients = JSON.parse(ingredients);
-    instructions = JSON.parse(instructions);
-    diets = JSON.parse(diets);
-    categories = JSON.parse(categories);
-    // End proccess req.body
+    // ingredients = JSON.parse(ingredients);
+    // instructions = JSON.parse(instructions);
+    // diets = JSON.parse(diets);
+    // categories = JSON.parse(categories);
 
     // Validate values
-    validateRequired("UserId", userId);
-    validateRequired("Description", description);
-    validateRecipeTitle(title);
-    validateIngredients(ingredients);
-    validateInstructions(instructions);
-    if (sourceUrl) validateSourceUrl(sourceUrl);
-    if (yield) validateYield(yield);
-    if (prepTime) validatePrepTime(prepTime);
-    if (difficultyLevel) validateDifficultyLevel(difficultyLevel);
-    if (img) validateImage(img);
+    validationsAPI.required("UserId", userId);
+    validationsAPI.required("Description", description);
+    validationsAPI.recipeTitle(title);
+    validationsAPI.ingredients(ingredients);
+    validationsAPI.instructions(instructions);
+    if (url) validationsAPI.sourceUrl(url);
+    if (yield) validationsAPI.yield(yield);
+    if (prepTime) validationsAPI.prepTime(prepTime);
+    if (difficultyLevel) validationsAPI.difficultyLevel(difficultyLevel);
+    if (image) validationsAPI.image(image);
     // End validate values
-
     // Add to recipes table
-    const resultCreateRecipe = await createRecipe(
+    const [resultCreateRecipe] = await recipesAPI.createRecipe(
       userId,
       title,
       description,
       source,
-      sourceUrl,
+      url,
       yield,
       prepTime,
       difficultyLevel,
-      img
+      image
     );
 
     const newRecipeId = resultCreateRecipe.insertId;
+    if (!newRecipeId) throw new Error('Error adding recipe details');
 
-    await addIngredients(newRecipeId, ingredients);
-    await addInstructions(newRecipeId, instructions);
-    await addDiets(newRecipeId, diets);
-    await addCategories(newRecipeId, categories);
+    await recipesAPI.addIngredients(newRecipeId, ingredients);
+    await recipesAPI.addInstructions(newRecipeId, instructions);
+    await recipesAPI.addDiets(newRecipeId, diets);
+    await recipesAPI.addCategories(newRecipeId, categories);
 
     res.status(200).send("OK");
   } catch (e) {

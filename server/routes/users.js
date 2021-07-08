@@ -1,12 +1,7 @@
 const express = require("express");
-const { signup, login, updateDetails } = require("../db");
+const { usersAPI } = require("../DAL/db");
 const router = express.Router();
-const {
-  validateEmail,
-  validateUsername,
-  validatePassword,
-  validateConfirmPassword,
-} = require("../../validations");
+const { validationsAPI } = require("../DAL/validations");
 
 /* GET users listing. */
 router.get("/", function (req, res, next) {
@@ -17,12 +12,13 @@ router.get("/", function (req, res, next) {
 router.post("/signup", async (req, res) => {
   try {
     const { email, username, password, confirmPassword } = req.body;
-    validateEmail(email);
-    validateUsername(username);
-    validatePassword(password);
-    validateConfirmPassword(confirmPassword, password);
+    validationsAPI.email(email);
+    validationsAPI.username(username);
+    validationsAPI.password(password);
+    validationsAPI.confirmPassword(confirmPassword, password);
 
-    const result = await signup(email, username, password);
+    const [result] = await usersAPI.signup(email, username, password);
+    if (!result.insertId) res.status(500).json(result.message);
     res.status(200).json(result);
   } catch (e) {
     res.status(500).json({ err: e.message });
@@ -34,11 +30,11 @@ router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    validateEmail(email);
-    validatePassword(password);
+    validationsAPI.email(email);
+    validationsAPI.password(password);
 
-    const result = await login(email, password);
-    if (!result.length) res.status(500).json({ err: "Username or password incorrect" });
+    const [result] = await usersAPI.login(email, password);
+
     res.status(200).json(result);
   } catch (e) {
     res.status(500).json({ err: e.message });
@@ -50,11 +46,11 @@ router.put("/update-details", async (req, res) => {
   try {
     const { id, username, password, confirmPassword } = req.body;
 
-    validateUsername(username);
-    validatePassword(password);
-    validateConfirmPassword(confirmPassword, password);
+    validationsAPI.username(username);
+    validationsAPI.password(password);
+    validationsAPI.confirmPassword(confirmPassword, password);
 
-    const result = await updateDetails(id, username, password);
+    const [result] = await usersAPI.updateDetails(id, username, password);
     res.status(200).json(result);
   } catch (e) {
     res.status(500).json({ err: e.message });

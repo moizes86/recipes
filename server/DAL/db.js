@@ -155,13 +155,13 @@ const recipesAPI = {
     }
   },
 
-  async createRecipe(userId, title, description, source, sourceUrl, yield, prepTime, difficultyLevel, img) {
+  async createRecipe(userId, title, description, source, url, yield, prepTime, difficultyLevel, image) {
     try {
       return ([result] = await promisePool.execute(
         "INSERT INTO recipesapp.recipes \
         (user_id, title, description, source, source_url, yield, prep_time, difficulty, image_url)\
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);",
-        [userId, title, description, source, sourceUrl, yield, prepTime, difficultyLevel, img]
+        [userId, title, description, source, url, yield, prepTime, difficultyLevel, image]
       ));
     } catch (e) {
       return [e];

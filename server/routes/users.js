@@ -18,7 +18,7 @@ router.post("/signup", async (req, res) => {
     validationsAPI.confirmPassword(confirmPassword, password);
 
     const [result] = await usersAPI.signup(email, username, password);
-    if (!result.insertId) res.status(500).json(result.message)
+    if (!result.insertId) res.status(500).json(result.message);
     res.status(200).json(result);
   } catch (e) {
     res.status(500).json({ err: e.message });
@@ -34,7 +34,7 @@ router.post("/login", async (req, res) => {
     validationsAPI.password(password);
 
     const [result] = await usersAPI.login(email, password);
-    if (!result.length)throw new Error( "Username or password incorrect" );
+
     res.status(200).json(result);
   } catch (e) {
     res.status(500).json({ err: e.message });

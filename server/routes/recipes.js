@@ -71,21 +71,21 @@ router.post("/add-recipe", async (req, res) => {
       title,
       description,
       source,
-      sourceUrl,
+      url,
       yield,
       prepTime,
       difficultyLevel,
-      img,
+      image,
       diets,
       categories,
       ingredients,
       instructions,
-    } = req.body;
+    } = (req.body);
 
-    ingredients = JSON.parse(ingredients);
-    instructions = JSON.parse(instructions);
-    diets = JSON.parse(diets);
-    categories = JSON.parse(categories);
+    // ingredients = JSON.parse(ingredients);
+    // instructions = JSON.parse(instructions);
+    // diets = JSON.parse(diets);
+    // categories = JSON.parse(categories);
 
     // Validate values
     validationsAPI.required("UserId", userId);
@@ -93,27 +93,27 @@ router.post("/add-recipe", async (req, res) => {
     validationsAPI.recipeTitle(title);
     validationsAPI.ingredients(ingredients);
     validationsAPI.instructions(instructions);
-    if (sourceUrl) validationsAPI.sourceUrl(sourceUrl);
+    if (url) validationsAPI.sourceUrl(url);
     if (yield) validationsAPI.yield(yield);
     if (prepTime) validationsAPI.prepTime(prepTime);
     if (difficultyLevel) validationsAPI.difficultyLevel(difficultyLevel);
-    if (img) validationsAPI.image(img);
+    if (image) validationsAPI.image(image);
     // End validate values
-
     // Add to recipes table
     const [resultCreateRecipe] = await recipesAPI.createRecipe(
       userId,
       title,
       description,
       source,
-      sourceUrl,
+      url,
       yield,
       prepTime,
       difficultyLevel,
-      img
+      image
     );
 
     const newRecipeId = resultCreateRecipe.insertId;
+    if (!newRecipeId) throw new Error('Error adding recipe details');
 
     await recipesAPI.addIngredients(newRecipeId, ingredients);
     await recipesAPI.addInstructions(newRecipeId, instructions);

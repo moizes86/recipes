@@ -10,12 +10,12 @@ export const getMeasuringUnits = async () => {
   return await httpGet(`${url}/measuring-units`);
 };
 
-export const getDietTypes = async () => {
-  return await httpGet(`${url}/diet-types`);
+export const getDiets = async () => {
+  return await httpGet(`${url}/diets`);
 };
 
-export const getMealTypes = async () => {
-  return await httpGet(`${url}/meal-types`);
+export const getCategories = async () => {
+  return await httpGet(`${url}/categories`);
 };
 
 export const getDiffictultyLevels = async () => {

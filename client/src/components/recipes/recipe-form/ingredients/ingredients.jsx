@@ -6,7 +6,7 @@ import RecipeFormItems from "../recipe-form-items/recipe-form-items";
 const Ingredients = ({ measuringUnits, ingredients, addItem, removeItem, submitError }) => {
   const [values, setValues] = useState({
     amount: 1,
-    measureUnit: "DEFAULT",
+    unitId: "DEFAULT",
     note: "",
   });
 
@@ -14,10 +14,10 @@ const Ingredients = ({ measuringUnits, ingredients, addItem, removeItem, submitE
 
   const handleIngredient = (e) => {
     e.preventDefault();
-    const { amount, measureUnit, note } = values;
-    if (amount && measureUnit && measureUnit !== "DEFAULT" && note) {
-      addItem({ amount, measureUnit, note }, "ingredients");
-      setValues({ amount: 1, measureUnit: "DEFAULT", note: "" });
+    const { amount, unitId, note } = values;
+    if (amount && unitId && unitId !== "DEFAULT" && note) {
+      addItem({ amount, unitId, note }, "ingredients");
+      setValues({ amount: 1, unitId: "DEFAULT", note: "" });
       if (error) setError("");
     } else {
       setError("All fields are required");
@@ -48,9 +48,9 @@ const Ingredients = ({ measuringUnits, ingredients, addItem, removeItem, submitE
           <label className="form-label font-bolder"> Units</label>
           <select
             className="form-control"
-            value={values.measureUnit}
+            value={values.unitId}
             defaultValue="DEFAULT"
-            name="measureUnit"
+            name="unitId"
             onChange={handleChange}
             required
           >

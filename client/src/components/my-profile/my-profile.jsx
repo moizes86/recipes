@@ -4,7 +4,7 @@ import InputField from "../form/input-field/input-field";
 import InputCheckbox from "../form/input-checkbox/input-checkbox";
 import CustomButton from "../custom-button/custom-button";
 
-import {  validateData } from "../../DAL/api";
+import { validateData } from "../../DAL/api";
 
 // Redux
 import { useDispatch, useSelector } from "react-redux";
@@ -28,6 +28,8 @@ const MyProfile = () => {
     password: false,
     confirmPassword: null,
   });
+
+  const [updateSuccess, setUpdateSuccess] = useState(false)
 
   const [diets, setDiets] = useState([]);
   const [dietsSelected, setDietsSelected] = useState([]);
@@ -60,19 +62,21 @@ const MyProfile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch(onLoading(true))
-    const updateResponse = await updateUserDetails(values);
+    dispatch(onLoading(true));
+    debugger;
+    const { id, username, password, confirmPassword } = values;
+    const updateResponse = await updateUserDetails({ id, username, password, confirmPassword });
     if (updateResponse.status === 200) {
-      dispatch(onUpdateUser(...updateResponse.data));
+      setUpdateSuccess(true);
     } else {
       setErrors("Something went wrong");
     }
-    dispatch(onLoading(false))
+    dispatch(onLoading(false));
   };
 
-  return (
-
-    loading ? 'LOADING':
+  return loading ? (
+    "LOADING"
+  ) : (
     <form onSubmit={handleSubmit}>
       <InputField
         label="Username"
@@ -105,6 +109,7 @@ const MyProfile = () => {
         errors={errors.confirmPassword}
       />
 
+    {updateSuccess && <p>Update Success</p>}
       {/* <InputCheckbox
         title="Diets"
         items={diets}
@@ -112,9 +117,7 @@ const MyProfile = () => {
         handleSelect={handleDietSelect}
       /> */}
 
-      <CustomButton disabled={!Object.values(errors).every((el) => el === false)}>
-        Submit
-      </CustomButton>
+      <CustomButton disabled={!Object.values(errors).every((el) => el === false)}>Submit</CustomButton>
     </form>
   );
 };

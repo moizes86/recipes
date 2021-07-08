@@ -14,7 +14,7 @@ const ImageUpload = ({image, addImage, removeImage}) => {
     } else if (!/image\/.*/.test(files[0].type)) {
       setError("Invalid file type: Images only");
     } else {
-      addImage({ type: "file", content: URL.createObjectURL(files[0]) });
+      addImage(URL.createObjectURL(files[0]));
       if (error) setError("");
     }
   };
@@ -22,7 +22,7 @@ const ImageUpload = ({image, addImage, removeImage}) => {
   const uploadImageUrl = (e) => {
     e.preventDefault();
     if (!image) {
-      addImage({type:'url', content: document.querySelector("#image-url").value});
+      addImage(document.querySelector("#image-url").value);
     } else {
       setError("An image is already set");
     }

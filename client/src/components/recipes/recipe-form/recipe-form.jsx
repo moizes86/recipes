@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 
 import {
   getMeasuringUnits,
-  getDietTypes,
-  getMealTypes,
+  getDiets,
+  getCategories,
   getDiffictultyLevels,
   addRecipe,
 } from "../../../services/API_Services/RecipeAPI";
@@ -18,17 +18,15 @@ import ImageUpload from "./image-upload/image-upload";
 import "./recipe-form.scss";
 const RecipeForm = () => {
   const [values, setValues] = useState({
-    user_id: 1,
+    userId: 1,
     title: "Chicken",
     source: "walla",
     url: "www.walla.co.il",
     image: null,
     description: "Gin tonic and muabet bet bet bet bet bet bet ",
     dietsSelected: [],
-    mealTypesSelected: [],
-    ingredients: [
-      { amount: 666, unit: 1, note: "Take the ball put it the basket pass pass it's a come" },
-    ],
+    categoriesSelected: [],
+    ingredients: [{ amount: 666, unitId: 1, note: "Take the ball put it the basket pass pass it's a come" }],
     instructions: ["Take the chicken", "Go fuck yourself"],
     difficultyLevel: undefined,
     prepTime: undefined,
@@ -44,18 +42,18 @@ const RecipeForm = () => {
   });
 
   const [measuringUnits, setMeasuringUnits] = useState([]);
-  const [dietTypes, setDietTypes] = useState([]);
-  const [mealsTypes, setMealTypes] = useState([]);
+  const [diets, setDiets] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [difficultyLevels, setDifficultyLevels] = useState([]);
 
   const getOptionsAsync = async () => {
     const measuringUnitsCall = await getMeasuringUnits();
-    const dietTypesCall = await getDietTypes();
-    const mealTypesCall = await getMealTypes();
+    const dietsCall = await getDiets();
+    const categoriesCall = await getCategories();
     const difficultyLevelsCall = await getDiffictultyLevels();
     setMeasuringUnits([...measuringUnitsCall.data]);
-    setDietTypes([...dietTypesCall.data]);
-    setMealTypes([...mealTypesCall.data]);
+    setDiets([...dietsCall.data]);
+    setCategories([...categoriesCall.data]);
     setDifficultyLevels([...difficultyLevelsCall.data]);
   };
 
@@ -68,6 +66,7 @@ const RecipeForm = () => {
   };
 
   const handleCheck = ({ target: { name, value, checked } }) => {
+    debugger
     if (checked) {
       values[name].push(value);
     } else {
@@ -106,12 +105,10 @@ const RecipeForm = () => {
     if (!regUrl.test(values.url)) errors["url"] = "Invalid Link";
 
     // Ingredients
-    if (values.ingredients.length === 0)
-      errors["ingredients"] = "Come on, at least one ingredient is necessary";
+    if (values.ingredients.length === 0) errors["ingredients"] = "Come on, at least one ingredient is necessary";
 
     // Instructions
-    if (values.instructions.length === 0)
-      errors["instructions"] = "At least one instruction is necessary";
+    if (values.instructions.length === 0) errors["instructions"] = "At least one instruction is necessary";
 
     // Total
     if (Object.values(errors).some((val) => val !== "")) {
@@ -126,7 +123,7 @@ const RecipeForm = () => {
     e.preventDefault();
     // if (validateForm() === "ok") console.table(values);
     validateForm();
-    addRecipe(values);
+    addRecipe({ ...values });
   };
 
   return (
@@ -196,19 +193,19 @@ const RecipeForm = () => {
       </div>
 
       <InputCheckbox
-        title="Diet Type:"
+        title="Diets:"
         name="dietsSelected"
-        items={dietTypes}
+        items={diets}
         itemsSelected={values.dietsSelected}
         handleCheck={handleCheck}
       />
 
       <div className="my-2"></div>
       <InputCheckbox
-        title="Meal Type:"
-        name="mealTypesSelected"
-        items={mealsTypes}
-        itemsSelected={values.mealTypesSelected}
+        title="Categories:"
+        name="categoriesSelected"
+        items={categories}
+        itemsSelected={values.categoriesSelected}
         handleCheck={handleCheck}
       />
 

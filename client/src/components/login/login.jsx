@@ -1,14 +1,13 @@
 import React, { useState } from "react";
 
-
 import { validateData } from "../../DAL/api";
 
 // Redux
-import {onLogin} from '../../redux/user/user.actions';
-import {useDispatch} from 'react-redux';
+import { onLogin } from "../../redux/user/user.actions";
+import { useDispatch } from "react-redux";
 
 // Routing
-import {useHistory} from 'react-router-dom';
+import { useHistory } from "react-router-dom";
 
 // Components
 import InputField from "../form/input-field/input-field";
@@ -18,7 +17,7 @@ import { loginUser } from "../../services/API_Services/UserAPI";
 const Login = () => {
   const dispatch = useDispatch();
   const history = useHistory();
-  
+
   const [values, setValues] = useState({
     email: "",
     password: "",
@@ -42,13 +41,14 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const loginResponse = await loginUser(values);
-    if (loginResponse.status === 200) {
-      setLoginError(false);
-      dispatch(onLogin(...loginResponse.data));
-      history.push('/');
+
+    const result = await loginUser(values);
+    if (!result.data.length) {
+      setLoginError("Invalid user or password");
     } else {
-      setLoginError('Wrong username or password');
+      if (loginError) setLoginError("");
+      dispatch(onLogin(...result.data));
+      history.push("/");
     }
   };
 
@@ -76,11 +76,7 @@ const Login = () => {
         errors={errors.password}
       />
 
-      <CustomButton
-        disabled={!Object.values(errors).every((el) => el === false)}
-      >
-        Login
-      </CustomButton>
+      <CustomButton disabled={!Object.values(errors).every((el) => el === false)}>Login</CustomButton>
 
       <br />
 

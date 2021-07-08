@@ -21,10 +21,10 @@ export const getUserById = async (id) => {
   }
 };
 
-export const loginUser = async(loginData)=>{
+export const loginUser = async (loginData) => {
   return httpPost(`${url}/login`, loginData);
-}
+};
 
 export const updateUserDetails = async (details) => {
   return httpPut(`${url}/update-details`, details);
-}
+};

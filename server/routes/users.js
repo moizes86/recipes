@@ -34,7 +34,7 @@ router.post("/login", async (req, res) => {
     validationsAPI.password(password);
 
     const [result] = await usersAPI.login(email, password);
-    if (!result.length) res.status(500).json({ err: "Username or password incorrect" });
+    if (!result.length)throw new Error( "Username or password incorrect" );
     res.status(200).json(result);
   } catch (e) {
     res.status(500).json({ err: e.message });

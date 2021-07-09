@@ -16,21 +16,24 @@ import Instructions from "./instructions/instructions";
 import ImageUpload from "./image-upload/image-upload";
 
 import "./recipe-form.scss";
+
+const { validationsAPI } = require("../../../DAL/validations");
+
 const RecipeForm = () => {
   const [values, setValues] = useState({
     userId: 1,
-    title: "Chicken",
-    source: "walla",
-    url: "www.walla.co.il",
+    title: "",
+    source: "",
+    url: "",
     image: null,
-    description: "Gin tonic and muabet bet bet bet bet bet bet ",
+    description: "",
     dietsSelected: [],
     categoriesSelected: [],
-    ingredients: [{ amount: 666, unitId: 1, note: "Take the ball put it the basket pass pass it's a come" }],
-    instructions: ["Take the chicken", "Go fuck yourself"],
+    ingredients: [],
+    instructions: [],
     difficultyLevel: undefined,
     prepTime: undefined,
-    yield: undefined,
+    _yield: undefined,
   });
 
   const [errors, setErrors] = useState({
@@ -39,22 +42,29 @@ const RecipeForm = () => {
     file: "",
     ingredients: "",
     instructions: "",
+    general: "",
   });
 
-  const [measuringUnits, setMeasuringUnits] = useState([]);
-  const [diets, setDiets] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [difficultyLevels, setDifficultyLevels] = useState([]);
+  const [options, setOptions] = useState({
+    measuringUnits: [],
+    diets: [],
+    categories: [],
+    difficultyLevels: [],
+  });
 
   const getOptionsAsync = async () => {
-    const measuringUnitsCall = await getMeasuringUnits();
-    const dietsCall = await getDiets();
-    const categoriesCall = await getCategories();
-    const difficultyLevelsCall = await getDiffictultyLevels();
-    setMeasuringUnits([...measuringUnitsCall.data]);
-    setDiets([...dietsCall.data]);
-    setCategories([...categoriesCall.data]);
-    setDifficultyLevels([...difficultyLevelsCall.data]);
+    const options = await Promise.all(
+      [await getMeasuringUnits(), await getDiets(), await getCategories(), await getDiffictultyLevels()].map(
+        (option) => option.data
+      )
+    );
+
+    setOptions({
+      measuringUnits: options[0],
+      diets: options[1],
+      categories: options[2],
+      difficultyLevels: options[3],
+    });
   };
 
   useEffect(() => {
@@ -65,12 +75,12 @@ const RecipeForm = () => {
     setValues({ ...values, [name]: value });
   };
 
-  const handleCheck = ({ target: { name, value, checked } }) => {
+  const handleCheck = ({ target: { name, checked,id } }) => {
     debugger
     if (checked) {
-      values[name].push(value);
+      values[name].push(id);
     } else {
-      values[name] = values[name].filter((item) => item !== value);
+      values[name] = values[name].filter((item) => item !== id);
     }
     setValues({ ...values });
   };
@@ -89,41 +99,37 @@ const RecipeForm = () => {
   const removeImage = () => setValues({ ...values, image: "" });
 
   const validateForm = () => {
-    const errors = {};
+    const {
+      userId,
+      title,
+      url,
+      image,
+      description,
+      ingredients,
+      instructions,
+      difficultyLevel,
+      _yield,
+    } = values;
+    try {
+      validationsAPI.required("UserId", userId);
+      validationsAPI.recipeTitle(title);
+      validationsAPI.required("Description", description);
+      validationsAPI.ingredients(ingredients);
+      validationsAPI.instructions(instructions);
+      validationsAPI.yield(_yield);
+      validationsAPI.difficultyLevel(difficultyLevel);
+      if (url) validationsAPI.url(url);
+      if (image) validationsAPI.image(image);
 
-    // Title
-    if (values.title.length < 3) {
-      errors["title"] = "Too short! Minimum 3 letters";
-    } else if (values.title.length > 45) {
-      errors["title"] = "Too Long! Maximum 45 letters";
-    }
-
-    // Url
-    const regUrl =
-      /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/g;
-
-    if (!regUrl.test(values.url)) errors["url"] = "Invalid Link";
-
-    // Ingredients
-    if (values.ingredients.length === 0) errors["ingredients"] = "Come on, at least one ingredient is necessary";
-
-    // Instructions
-    if (values.instructions.length === 0) errors["instructions"] = "At least one instruction is necessary";
-
-    // Total
-    if (Object.values(errors).some((val) => val !== "")) {
-      setErrors({ ...errors, addRecipe: "Please review your details" });
-    } else {
-      setErrors({});
-      return "ok";
+      return true;
+    } catch (e) {
+      setErrors({ ...errors, general: e.message });
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // if (validateForm() === "ok") console.table(values);
-    validateForm();
-    addRecipe({ ...values });
+    if (validateForm()) addRecipe({ ...values });
   };
 
   return (
@@ -137,7 +143,7 @@ const RecipeForm = () => {
           type="text"
           placeholder="Enter recipe name"
           value={values.title}
-          required={true}
+          // required={true}
           shrinkLabel={false}
           errors={errors.title}
           classes="font-bolder pl-0"
@@ -187,7 +193,7 @@ const RecipeForm = () => {
           name="description"
           value={values.description}
           rows="3"
-          required
+          // required
           onChange={handleChange}
         ></textarea>
       </div>
@@ -195,7 +201,7 @@ const RecipeForm = () => {
       <InputCheckbox
         title="Diets:"
         name="dietsSelected"
-        items={diets}
+        items={options.diets}
         itemsSelected={values.dietsSelected}
         handleCheck={handleCheck}
       />
@@ -204,7 +210,7 @@ const RecipeForm = () => {
       <InputCheckbox
         title="Categories:"
         name="categoriesSelected"
-        items={categories}
+        items={options.categories}
         itemsSelected={values.categoriesSelected}
         handleCheck={handleCheck}
       />
@@ -224,13 +230,14 @@ const RecipeForm = () => {
             <option disabled value="DEFAULT">
               --
             </option>
-            {difficultyLevels.map((item, i) => (
+            {options.difficultyLevels.map((item, i) => (
               <option key={`${item}-${i}`} value={item.id}>
                 {item.title}
               </option>
             ))}
           </select>
         </div>
+
         {/* ////////// END Difficulty Levels ////////////// */}
 
         <InputField
@@ -246,9 +253,10 @@ const RecipeForm = () => {
         />
         <InputField
           label="Yield"
-          name="yield"
+          name="_yield"
           type="number"
-          value={values.yield}
+          value={values._yield}
+          max={10}
           required={false}
           shrinkLabel={false}
           classes="font-bolder"
@@ -258,7 +266,7 @@ const RecipeForm = () => {
       </div>
 
       <Ingredients
-        measuringUnits={measuringUnits}
+        measuringUnits={options.measuringUnits}
         ingredients={values.ingredients}
         submitError={errors.ingredients}
         addItem={addItem}
@@ -271,7 +279,7 @@ const RecipeForm = () => {
         Add Recipe
       </button>
       <br />
-      {errors.addRecipe && <small>{errors.addRecipe}</small>}
+      {errors.general && <small>{errors.general}</small>}
     </form>
   );
 };

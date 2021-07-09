@@ -4,7 +4,7 @@ import InputField from "../form/input-field/input-field";
 import InputCheckbox from "../form/input-checkbox/input-checkbox";
 import CustomButton from "../custom-button/custom-button";
 
-import {  validateData } from "../../DAL/api";
+import { validateData } from "../../DAL/api";
 
 import { createUser } from "../../services/API_Services/UserAPI";
 
@@ -69,15 +69,13 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     dispatch(onLoading(true));
-    
+
     const response = await createUser({ values, dietsSelected });
     if (response.status === 200) {
-      dispatch(onLogin(...response.data));
-      history.push('/');
-
+      history.push("/");
     } else {
-      if(response.data.errno === 1062) setSignupError('User already exists');
-      else setSignupError('Well, something went wrong')
+      if (response.data.errno === 1062) setSignupError("User already exists");
+      else setSignupError("Well, something went wrong");
     }
     dispatch(onLoading(false));
   };
@@ -125,16 +123,9 @@ const Signup = () => {
         errors={errors.confirmPassword}
       />
 
-      <InputCheckbox
-        title="Diets"
-        items={diets}
-        itemsSelected={dietsSelected}
-        handleSelect={handleDietSelect}
-      />
+      <InputCheckbox title="Diets" items={diets} itemsSelected={dietsSelected} handleSelect={handleDietSelect} />
 
-      <CustomButton disabled={!Object.values(errors).every((el) => el === false)}>
-        Submit
-      </CustomButton>
+      <CustomButton disabled={!Object.values(errors).every((el) => el === false)}>Submit</CustomButton>
 
       <br />
 

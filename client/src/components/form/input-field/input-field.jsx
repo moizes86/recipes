@@ -1,5 +1,3 @@
-
-
 import React, { useState } from "react";
 
 import "./input-field.scss";
@@ -9,7 +7,8 @@ const InputField = ({
   name,
   type,
   placeholder,
-  value='',
+  value = "",
+  max,
   required,
   shrinkLabel = true,
   classes,
@@ -21,11 +20,7 @@ const InputField = ({
   const [inputFocused, setInputFocused] = useState(false);
   return (
     <div controlid={name} className={`form-group flex-grow-1  ${shrinkLabel ? "parent-for-input-shrink" : cols}`}>
-      <label
-        className={`form-label ${ 
-          shrinkLabel ? (inputFocused || value.length) && "shrink" : classes
-        }`}
-      >
+      <label className={`form-label ${shrinkLabel ? (inputFocused || value.length) && "shrink" : classes}`}>
         {label}
       </label>
       <input
@@ -34,7 +29,8 @@ const InputField = ({
         id={name}
         placeholder={placeholder}
         value={value}
-        min = '0'
+        min="1"
+        max={max}
         required={required}
         className={`form-control`}
         onChange={handleChange}

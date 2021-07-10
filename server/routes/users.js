@@ -11,15 +11,20 @@ router.get("/", function (req, res, next) {
 /* POST user signup */
 router.post("/signup", async (req, res) => {
   try {
-    const { email, username, password, confirmPassword } = req.body;
+    const {
+      values: { email, username, password, confirmPassword },
+    } = req.body;
     validationsAPI.email(email);
     validationsAPI.username(username);
     validationsAPI.password(password);
     validationsAPI.confirmPassword(confirmPassword, password);
 
     const [result] = await usersAPI.signup(email, username, password);
-    if (!result.insertId) res.status(500).json(result.message);
-    res.status(200).json(result);
+    if (!result.insertId) {
+      res.status(500).json(result);
+    } else {
+      res.status(200).json(result);
+    }
   } catch (e) {
     res.status(500).json({ err: e.message });
   }

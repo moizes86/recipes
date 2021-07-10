@@ -57,16 +57,20 @@ const recipesAPI = {
 
   async getRecipe(recipeId) {
     try {
-      return ([result] = await promisePool.execute("SELECT * FROM recipesapp.recipes WHERE (id = ?);", [recipeId]));
+      const [result] = await promisePool.execute(
+        "SELECT *, user_id as userId FROM recipesapp.recipes WHERE (id = ?);",
+        [recipeId]
+      );
+      return result[0];
     } catch (e) {
-      return [e];
+      return e;
     }
   },
 
   async getIngredientsForRecipe(recipeId) {
     try {
       return ([result] = await promisePool.execute(
-        "SELECT i.note, i.amount, mu.unit \
+        "SELECT i.id, i.note, i.amount, mu.id as unitId, mu.unit \
         FROM recipesapp.ingredients i \
         JOIN recipesapp.measuring_units mu \
         ON i.unit_id= mu.id AND i.recipe_id = ? \
@@ -74,52 +78,52 @@ const recipesAPI = {
         [recipeId]
       ));
     } catch (e) {
-      return [e];
+      return e;
     }
   },
 
   async getInstructionsForRecipe(recipeId) {
     try {
       let [result] = await promisePool.execute(
-        "SELECT instruction FROM recipesapp.instructions \
+        "SELECT id, instruction FROM recipesapp.instructions \
         WHERE recipe_id = ? ;",
         [recipeId]
       );
-      return result.map((item) => item.instruction);
+      return result;
     } catch (e) {
-      return [e];
+      return e;
     }
   },
 
   async getDietsForRecipe(recipeId) {
     try {
       let [result] = await promisePool.execute(
-        "SELECT d.title \
+        "SELECT d.id \
         FROM recipesapp.diets d \
         JOIN recipesapp.recipes_diets rd \
         ON rd.diet_id = d.id \
         WHERE rd.recipe_id= ? ;",
         [recipeId]
       );
-      return result.map((item) => item.title);
+      return result.map((item) => item.id);
     } catch (e) {
-      return [e];
+      return e;
     }
   },
 
   async getCategoriesForRecipe(recipeId) {
     try {
       let [result] = await promisePool.execute(
-        "SELECT c.title \
+        "SELECT c.id \
         FROM recipesapp.categories c \
         JOIN recipesapp.recipes_categories rc \
         ON rc.category_id = c.id \
         WHERE rc.recipe_id= ? ;",
         [recipeId]
       );
-      return result.map((item) => item.title);
+      return result.map((item) => item.id);
     } catch (e) {
-      return [e];
+      return e;
     }
   },
 
@@ -155,7 +159,17 @@ const recipesAPI = {
     }
   },
 
-  async createRecipe(userId, title, description, source, url, yield, prepTime, difficultyLevel, image) {
+  async createRecipe(
+    userId,
+    title,
+    description,
+    source = null,
+    url = null,
+    yield = null,
+    prepTime = null,
+    difficultyLevel = null,
+    image = null
+  ) {
     try {
       return ([result] = await promisePool.execute(
         "INSERT INTO recipesapp.recipes \
@@ -171,12 +185,12 @@ const recipesAPI = {
   async addIngredients(recipeId, ingredients) {
     try {
       ingredients.forEach((ingredient) => {
-        const { note, amount, unitId } = ingredient;
+        const { id, note, amount, unitId } = ingredient;
         promisePool.execute(
-          "INSERT INTO recipesapp.ingredients\
-         ( recipe_id, note , amount, unit_id)\
-          VALUES (?,?,?,?)",
-          [recipeId, note, amount, unitId]
+          "INSERT IGNORE INTO recipesapp.ingredients\
+         ( id, recipe_id, note , amount, unit_id)\
+          VALUES (?,?,?,?,?)",
+          [id, recipeId, note, amount, unitId]
         );
       });
     } catch (e) {
@@ -188,10 +202,10 @@ const recipesAPI = {
     try {
       instructions.forEach((instruction) => {
         promisePool.execute(
-          "INSERT INTO recipesapp.instructions\
-          (recipe_id, instruction)\
-          VALUES (?,?)",
-          [recipeId, instruction]
+          "INSERT IGNORE INTO recipesapp.instructions\
+          (id, recipe_id, instruction)\
+          VALUES (?,?,?)",
+          [instruction.id ?? null ,recipeId, instruction.instruction]
         );
       });
     } catch (e) {
@@ -226,6 +240,67 @@ const recipesAPI = {
       });
     } catch (e) {
       return [e];
+    }
+  },
+
+  async deleteDiets(recipeId) {
+    try {
+      promisePool.execute("DELETE FROM recipesapp.recipes_diets WHERE recipe_id = ?", [recipeId]);
+    } catch (e) {
+      return e;
+    }
+  },
+
+  async deleteCategories(recipeId) {
+    try {
+      promisePool.execute("DELETE FROM recipesapp.recipes_categories WHERE recipe_id = ?", [recipeId]);
+    } catch (e) {
+      return e;
+    }
+  },
+
+  async deleteIngredients(recipeId, ingredientId) {
+    try {
+      promisePool.execute("DELETE FROM recipesapp.ingredients WHERE recipe_id = ? AND id = ? ;", [
+        recipeId,
+        ingredientId,
+      ]);
+    } catch (e) {
+      return e;
+    }
+  },
+
+  async deleteInstructions(recipeId, instructionId) {
+    try {
+      promisePool.execute("DELETE FROM recipesapp.instructions WHERE recipe_id = ? AND id = ? ;", [
+        recipeId,
+        instructionId,
+      ]);
+    } catch (e) {
+      return e;
+    }
+  },
+
+  async updateRecipe(recipeId, title, description, source, url, yield, prepTime, difficultyLevel, image) {
+    try {
+      return ([result] = await promisePool.execute(
+        "UPDATE recipesapp.recipes SET \
+        title = ?, description =? , source=?, source_url=?, yield=?, prep_time=?, difficulty=?, image_url=? \
+        WHERE id = ?",
+        [
+          title,
+          description,
+          source ?? null,
+          url ?? null,
+          yield ?? null,
+          prepTime ?? null,
+          difficultyLevel ?? null,
+          image ?? null,
+          recipeId,
+        ]
+      ));
+    } catch (e) {
+      return e;
     }
   },
 };

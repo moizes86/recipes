@@ -4,13 +4,11 @@ const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const cors = require("cors");
 
-
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const recipesRouter = require("./routes/recipes");
 
 const app = express();
-
 
 app.use(logger("dev"));
 app.use(express.json());

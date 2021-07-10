@@ -58,7 +58,7 @@ const Ingredients = ({ measuringUnits, ingredients, addItem, removeItem, submitE
               --
             </option>
             {measuringUnits.map((unit, i) => (
-              <option key={`${unit}-${i}`} id={unit.id} value={unit.id}>
+              <option key={`${unit}-${i}`} value={unit.id} label={unit.unit}>
                 {unit.unit}
               </option>
             ))}
@@ -80,7 +80,7 @@ const Ingredients = ({ measuringUnits, ingredients, addItem, removeItem, submitE
         </div>
       </div>
 
-      <RecipeFormItems title="ingredients" items={ingredients} removeItem={removeItem} />
+      <RecipeFormItems title="ingredients" items={ingredients} measuringUnits={measuringUnits} removeItem={removeItem} />
 
       <button className="btn btn-primary mr-3" onClick={handleIngredient}>
         Add

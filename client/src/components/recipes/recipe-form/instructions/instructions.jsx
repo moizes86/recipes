@@ -5,22 +5,22 @@ import RecipeFormItems from "../recipe-form-items/recipe-form-items";
 
 const Instructions = ({ instructions, addItem, removeItem }) => {
   const [instruction, setInstruction] = useState("");
-  const [error, setError] = useState('')
+  const [error, setError] = useState("");
 
   const handleChange = ({ target: { value } }) => {
     setInstruction(value);
   };
 
-  const addInstruction = e =>{
+  const addInstruction = (e) => {
     e.preventDefault();
-    if (instruction){
-      addItem(instruction, 'instructions')
-      setInstruction('')
-      if(error) setError('')
-    }else{
-      setError('Required')
+    if (instruction) {
+      addItem({ instruction }, "instructions");
+      setInstruction("");
+      if (error) setError("");
+    } else {
+      setError("Required");
     }
-  }
+  };
 
   return (
     <div className="instructions my-4">

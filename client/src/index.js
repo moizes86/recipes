@@ -32,7 +32,7 @@ ReactDOM.render(
             <Route exact path="/" component={App} />
 
             <Route exact path="/recipe-details" component={Recipe} />
-            <Route exact path="/new-recipe" component={RecipeForm} />
+            <Route exact path={["/add-recipe", "/edit-recipe"]} component={RecipeForm} />
             <Route exact path="/my-profile" component={MyProfile} />
           </Switch>
         </div>

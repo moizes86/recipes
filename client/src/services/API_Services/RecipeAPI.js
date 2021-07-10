@@ -1,9 +1,13 @@
-import { httpGet, httpPost } from "../CRUD_Service";
+import { httpGet, httpPost, httpPut } from "../CRUD_Service";
 
 const url = "http://localhost:3100/recipes";
 
 export const getRecipes = async () => {
   return await httpGet(url);
+};
+
+export const getRecipe = async (id) => {
+  return await httpGet(`${url}/recipe?recipeId=${id}`);
 };
 
 export const getMeasuringUnits = async () => {
@@ -19,9 +23,13 @@ export const getCategories = async () => {
 };
 
 export const getDiffictultyLevels = async () => {
-    return await httpGet(`${url}/difficulty-levels`);
+  return await httpGet(`${url}/difficulty-levels`);
 };
 
-export const addRecipe = async (data) =>{
-  return await httpPost(`${url}/add-recipe`, data)
+export const addRecipe = async (data) => {
+  return await httpPost(`${url}/add-recipe`, data);
+};
+
+export const editRecipe = async (data)=>{
+  return await httpPut(`${url}/edit-recipe`, data)
 }

@@ -2,18 +2,20 @@ import React from "react";
 
 import "./recipe-form-items.scss";
 
-const RecipeFormItems = ({ title, items = [], removeItem }) => {
+const RecipeFormItems = ({ title, items = [], removeItem, measuringUnits }) => {
   return (
     <ul className="recipe-form-items">
       {items.map((item, i) => (
-        <li key={`${item.note}-${i}`}>
-          <span id={i} title={title} className="remove-item" onClick={removeItem}>
+        <li key={`${item.id}-${i}`}>
+          <span id={item.id} title={title} index={i} className="remove-item" onClick={removeItem}>
             X
           </span>
-          {typeof item === "string" ? (
-            <span>{item}</span>
+          {item.instruction ? (
+            <span index={i}>{item.instruction}</span>
           ) : (
-            Object.values(item).map((field, i) => <span key={`${item}-${i}`}>{field}</span>)
+            <span id={item.id}>
+              {item.amount} {measuringUnits[+item.unitId - 1]?.unit} {item.note}{" "}
+            </span>
           )}
         </li>
       ))}

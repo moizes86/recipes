@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 
 // Redux
 import { useDispatch, useSelector } from "react-redux";
-import { onLogout } from "../../redux/user/user.actions";
+import { onLogout } from "../../redux/actions";
 
 // Components
 import MyModal from "../my-modal/my-modal";
@@ -15,7 +15,7 @@ import "./my-navbar.scss";
 const MyNavbar = () => {
   const dispatch = useDispatch();
   const history = useHistory();
-  const activeUser = useSelector((state) => state.user.activeUser);
+  const activeUser = useSelector((state) => state.activeUser);
 
   return (
     <nav className="my-navbar navbar navbar-expand-md navbar-light bg-dark mb-5">
@@ -38,7 +38,7 @@ const MyNavbar = () => {
           <ul className="navbar-nav justify-content-end w-100">
             {activeUser && (
               <>
-                <li className="nav-link text-light" onClick={() => history.push("/new-recipe")}>
+                <li className="nav-link text-light" onClick={() => history.push("/add-recipe")}>
                   New Recipe
                 </li>
                 <li className="nav-link text-light" onClick={() => history.push("/edit-recipe")}>

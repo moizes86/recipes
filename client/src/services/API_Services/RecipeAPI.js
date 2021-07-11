@@ -30,6 +30,10 @@ export const addRecipe = async (data) => {
   return await httpPost(`${url}/add-recipe`, data);
 };
 
-export const editRecipe = async (data)=>{
-  return await httpPut(`${url}/edit-recipe`, data)
-}
+export const editRecipe = async (data) => {
+  return await httpPut(`${url}/edit-recipe`, data);
+};
+
+export const searchRecipe = async (data) => {
+  return await httpGet(`${url}/search?q=${data}`);
+};

@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
 
 import InputField from "../form/input-field/input-field";
-import InputCheckbox from "../form/input-checkbox/input-checkbox";
 import CustomButton from "../custom-button/custom-button";
 
 import { validateData } from "../../DAL/api";
 
 // Redux
 import { useDispatch, useSelector } from "react-redux";
-import { onLoading, onUpdateUser } from "../../redux/user/user.actions";
+import { onLoading, onUpdateUser } from "../../redux/actions";
 
 // Routing
 import { history, useHistory } from "react-router-dom";
@@ -17,7 +16,7 @@ import { updateUserDetails } from "../../services/API_Services/UserAPI";
 const MyProfile = () => {
   const dispatch = useDispatch();
   const history = useHistory();
-  let { activeUser, loading } = useSelector((state) => state.user);
+  let { activeUser, loading } = useSelector((state) => state);
 
   const [values, setValues] = useState({
     ...activeUser,
@@ -63,7 +62,6 @@ const MyProfile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     dispatch(onLoading(true));
-    debugger;
     const { id, username, password, confirmPassword } = values;
     const updateResponse = await updateUserDetails({ id, username, password, confirmPassword });
     if (updateResponse.status === 200) {

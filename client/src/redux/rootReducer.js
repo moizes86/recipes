@@ -1,11 +1,34 @@
-import { combineReducers } from "redux";
+const initialState = { activeUser: false, loading: false, recipes: [] };
 
-import userReducer from "./user/user.reducer";
-import searchReducer from "./search/search.reducer";
+const rootReducer = (state = initialState, action) => {
+  switch (action.type) {
+    case "ON_LOGIN":
+    case "ON_UPDATE_USER":
+      return {
+        ...state,
+        activeUser: action.payload,
+      };
 
-const rootReducer = combineReducers({
-  user: userReducer,
-  search: searchReducer
-});
+    case "ON_LOGOUT":
+      return {
+        ...state,
+        activeUser: false,
+      };
+
+    case "ON_LOADING":
+      return {
+        ...state,
+        loading: action.payload,
+      };
+
+    case "ON_SET_RECIPES":
+      return {
+        ...state,
+        recipes: action.payload,
+      };
+    default:
+      return state;
+  }
+};
 
 export default rootReducer;

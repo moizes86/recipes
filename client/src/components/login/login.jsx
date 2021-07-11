@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { validateData } from "../../DAL/api";
 
 // Redux
-import { onLogin } from "../../redux/user/user.actions";
+import { onLogin } from "../../redux/actions";
 import { useDispatch } from "react-redux";
 
 // Routing

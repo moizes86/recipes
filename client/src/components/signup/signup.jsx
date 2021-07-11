@@ -10,7 +10,7 @@ import { createUser } from "../../services/API_Services/UserAPI";
 
 // Redux
 import { useDispatch } from "react-redux";
-import { onLoading, onLogin } from "../../redux/user/user.actions";
+import { onLoading, onLogin } from "../../redux/actions";
 
 // Routing
 import { history, useHistory } from "react-router-dom";

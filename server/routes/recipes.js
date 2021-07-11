@@ -13,6 +13,16 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/search?:q", async (req, res) => {
+  try {
+    const { q } = req.query;
+    const [result] = await recipesAPI.getRecipesBySearch(q);
+    res.status(200).json(result);
+  } catch (e) {
+    res.status(500).json({ err: e.message });
+  }
+});
+
 router.get("/recipe?:recipeId", async (req, res) => {
   try {
     const { recipeId } = req.query;
@@ -175,6 +185,7 @@ router.put("/edit-recipe", async (req, res) => {
     // Instructions
     await instructionsDeleted.forEach((instructionId) => recipesAPI.deleteInstructions(recipeId, instructionId));
     await recipesAPI.addInstructions(recipeId, instructions);
+
     // Diets
     await recipesAPI.deleteDiets(recipeId);
     await recipesAPI.addDiets(recipeId, dietsSelected);

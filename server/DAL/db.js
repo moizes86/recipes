@@ -51,7 +51,18 @@ const recipesAPI = {
     try {
       return ([result] = await promisePool.execute(`SELECT * FROM recipesapp.recipes;`));
     } catch (e) {
-      return [e];
+      return e;
+    }
+  },
+
+  async getRecipesBySearch(q) {
+    try {
+      return ([result] = await promisePool.execute(
+        `SELECT * FROM recipesapp.recipes WHERE title LIKE N'%${q}%' \ 
+        ORDER BY case when title LIKE N'${q}%' then 1 else 2 end;;`
+      ));
+    } catch (e) {
+      return e;
     }
   },
 
@@ -205,7 +216,7 @@ const recipesAPI = {
           "INSERT IGNORE INTO recipesapp.instructions\
           (id, recipe_id, instruction)\
           VALUES (?,?,?)",
-          [instruction.id ?? null ,recipeId, instruction.instruction]
+          [instruction.id ?? null, recipeId, instruction.instruction]
         );
       });
     } catch (e) {

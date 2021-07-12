@@ -65,14 +65,6 @@ router.get("/categories", async (req, res) => {
   }
 });
 
-router.get("/difficulty-levels", async (req, res) => {
-  try {
-    const [result] = await recipesAPI.getDifficultyLevels();
-    res.status(200).json(result);
-  } catch (e) {
-    res.status(500).json({ err: e.message });
-  }
-});
 
 router.post("/add-recipe", async (req, res) => {
   try {
@@ -82,9 +74,8 @@ router.post("/add-recipe", async (req, res) => {
       description,
       source,
       source_url,
-      _yield,
-      prep_time,
-      difficulty,
+      servings,
+      cook,
       image,
       dietsSelected,
       categoriesSelected,
@@ -99,9 +90,8 @@ router.post("/add-recipe", async (req, res) => {
     validationsAPI.ingredients(ingredients);
     validationsAPI.instructions(instructions);
     if (source_url) validationsAPI.sourceUrl(source_url);
-    if (_yield) validationsAPI.yield(_yield);
-    if (prep_time) validationsAPI.prepTime(prep_time);
-    if (difficulty) validationsAPI.difficultyLevel(difficulty);
+    if (servings) validationsAPI.servings(servings);
+    if (cook) validationsAPI.cook(cook);
     if (image) validationsAPI.image(image);
     // End validate values
 
@@ -112,14 +102,12 @@ router.post("/add-recipe", async (req, res) => {
       description,
       source,
       source_url,
-      _yield,
-      prep_time,
-      difficulty,
+      servings,
+      cook,
       image
     );
 
     const newRecipeId = resultCreateRecipe.insertId;
-    if (!newRecipeId) throw new Error(resultCreateRecipe);
 
     await recipesAPI.addIngredients(newRecipeId, ingredients);
     await recipesAPI.addInstructions(newRecipeId, instructions);
@@ -135,14 +123,13 @@ router.post("/add-recipe", async (req, res) => {
 router.put("/edit-recipe", async (req, res) => {
   try {
     let {
-      id: recipeId,
+      id:recipe_id,
       title,
       description,
       source,
       source_url,
-      _yield,
-      prep_time,
-      difficulty,
+      servings,
+      cook,
       image,
       dietsSelected,
       categoriesSelected,
@@ -153,46 +140,43 @@ router.put("/edit-recipe", async (req, res) => {
     } = req.body;
 
     // Validate values
-    //  validationsAPI.required("UserId", user_id);
     validationsAPI.required("Description", description);
     validationsAPI.recipeTitle(title);
     validationsAPI.ingredients(ingredients);
     validationsAPI.instructions(instructions);
     if (source_url) validationsAPI.sourceUrl(source_url);
-    if (_yield) validationsAPI.yield(_yield);
-    if (prep_time) validationsAPI.prepTime(prep_time);
-    if (difficulty) validationsAPI.difficultyLevel(difficulty);
+    if (servings) validationsAPI.servings(servings);
+    if (cook) validationsAPI.cook(cook);
     if (image) validationsAPI.image(image);
     // End validate values
 
     // Add to recipes table
     await recipesAPI.updateRecipe(
-      recipeId,
+      recipe_id,
       title,
       description,
       source,
       source_url,
-      _yield,
-      prep_time,
-      difficulty,
+      servings,
+      cook,
       image
     );
 
     // Ingredients
-    await ingredientsDeleted.forEach((ingredientId) => recipesAPI.deleteIngredients(recipeId, ingredientId));
-    await recipesAPI.addIngredients(recipeId, ingredients);
+    await ingredientsDeleted.forEach((ingredientId) => recipesAPI.deleteIngredients(ingredientId));
+    await recipesAPI.addIngredients(recipe_id, ingredients);
 
     // Instructions
-    await instructionsDeleted.forEach((instructionId) => recipesAPI.deleteInstructions(recipeId, instructionId));
-    await recipesAPI.addInstructions(recipeId, instructions);
+    await instructionsDeleted.forEach((instructionId) => recipesAPI.deleteInstructions(instructionId));
+    await recipesAPI.addInstructions(recipe_id, instructions);
 
     // Diets
-    await recipesAPI.deleteDiets(recipeId);
-    await recipesAPI.addDiets(recipeId, dietsSelected);
+    await recipesAPI.deleteDiets(recipe_id);
+    await recipesAPI.addDiets(recipe_id, dietsSelected);
 
     // Categories
-    await recipesAPI.deleteCategories(recipeId);
-    await recipesAPI.addCategories(recipeId, categoriesSelected);
+    await recipesAPI.deleteCategories(recipe_id);
+    await recipesAPI.addCategories(recipe_id, categoriesSelected);
 
     res.status(200).send("OK");
   } catch (e) {

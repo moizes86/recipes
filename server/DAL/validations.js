@@ -35,26 +35,22 @@ const validationsAPI = {
 
   recipeTitle(title) {
     this.required("Title", title);
-    if (title.length < 6) throw Error("Title must be at least six chars");
+    if (title.length < 4) throw Error("Title must be at least four chars");
     if (title.length > 45) throw Error("Title is too long! Maximum 45 chars");
   },
 
   sourceUrl(sourceUrl) {
     const reg =
-      /^(https?:\/\/)?(www\.)[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
+      /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
     if (!reg.test(sourceUrl)) throw Error("Invalid source url");
   },
 
-  yield(yield) {
-    if (yield < 1 || yield > 10) throw Error("Yield must be between 1-10");
+  servings(n) {
+    if (n < 1 || n > 10) throw Error("Servings must be between 1-10");
   },
 
-  prepTime(prepTime) {
-    if (prepTime < 1) throw Error("Invalid prep-time");
-  },
-
-  difficultyLevel(difficultyLevel) {
-    if (difficultyLevel > 3 || difficultyLevel < 1) throw Error("Difficulty level must be between 1-3");
+  cook(n) {
+    if (n < 1) throw Error("Invalid cook time");
   },
 
   image(image) {
@@ -65,7 +61,7 @@ const validationsAPI = {
   ingredients(ingredients) {
     if (!ingredients.length) throw Error("Ingredients are required");
     ingredients.forEach((ingredient) => {
-      if (!ingredient.note || !ingredient.unitId) throw Error("Invalid ingredient");
+      if (!ingredient.text || ingredient.amount < 0.5)  throw Error("Invalid ingredient");
     });
   },
 

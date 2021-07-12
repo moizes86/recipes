@@ -6,19 +6,21 @@ import { BrowserRouter, Switch, Route } from "react-router-dom";
 // Redux
 import { Provider } from "react-redux";
 import store from "./redux/store";
-import {useSelector} from 'react-redux';
 
 // Components
 import App from "./App";
-import MyNavbar from "./components/my-navbar/my-navbar";
-import Recipe from "./components/recipes/recipe/recipe";
-import RecipeForm from "./components/recipes/recipe-form/recipe-form";
+import Navbar from "./components/Navbar";
+import RecipePage from "./components/RecipePage";
+import RecipeForm from "./components/Forms/RecipeForm";
+import MyProfile from "./components/MyProfile";
+import Signup from "./components/Signup";
+import Login from "./components/Login";
 
 // Styles
 import "bootstrap/dist/css/bootstrap.css";
 import "./index.scss";
 import "./settings.scss";
-import MyProfile from "./components/my-profile/my-profile";
+import Footer from "./components/Footer";
 
 
 
@@ -26,16 +28,18 @@ ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
       <BrowserRouter>
-        <MyNavbar />
-        <div className="container-md pb-5">
+        <Navbar />
+        <div className="container-md">
           <Switch>
             <Route exact path="/" component={App} />
-
-            <Route exact path="/recipe-details" component={Recipe} />
+            <Route exact path="/signup" component={Signup} />
+            <Route exact path="/login" component={Login} />
+            <Route exact path="/recipes/:id" component={RecipePage} />
             <Route exact path={["/add-recipe", "/edit-recipe"]} component={RecipeForm} />
             <Route exact path="/my-profile" component={MyProfile} />
           </Switch>
         </div>
+        <Footer/>
       </BrowserRouter>
     </Provider>
   </React.StrictMode>,

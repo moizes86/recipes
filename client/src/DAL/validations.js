@@ -40,21 +40,18 @@ const validationsAPI = {
 
   url(url) {
     const reg =
-      /^(https?:\/\/)?(www\.)[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
+      /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
     if (!reg.test(url)) throw Error("Invalid source url");
   },
 
-  yield(y) {
-    if (y < 1 || y > 10) throw Error("Yield must be between 1-10");
+  servings(n) {
+    if (n < 1 || n > 10) throw Error("Servings must be between 1-10");
   },
 
-  prepTime(prepTime) {
-    if (prepTime < 1) throw Error("Invalid prep-time");
+  cook(n) {
+    if (n < 1) throw Error("Invalid cooking time");
   },
 
-  difficultyLevel(difficultyLevel) {
-    if (difficultyLevel > 3 || difficultyLevel < 1) throw Error("Difficulty level must be between 1-3");
-  },
 
   image(image) {
     const reg = /(http(s?):\/\/)(.)*\.(?:jpe?g|gif|png)/;
@@ -64,7 +61,7 @@ const validationsAPI = {
   ingredients(ingredients) {
     if (!ingredients.length) throw Error("Ingredients are required");
     ingredients.forEach((ingredient) => {
-      if (!ingredient.note || !ingredient.unitId) throw Error("Invalid ingredient");
+      if (!ingredient.text || !ingredient.unitId) throw Error("Invalid ingredient");
     });
   },
 

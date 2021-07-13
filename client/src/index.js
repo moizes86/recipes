@@ -20,8 +20,6 @@ import Login from "./components/Login";
 import "bootstrap/dist/css/bootstrap.css";
 import "./index.scss";
 import "./styles/styles.scss";
-import Footer from "./components/Footer";
-
 
 
 ReactDOM.render(
@@ -29,7 +27,7 @@ ReactDOM.render(
     <Provider store={store}>
       <BrowserRouter>
         <Navbar />
-        <div className="container">
+        <div className="container-md">
           <Switch>
             <Route exact path="/" component={App} />
             <Route exact path="/signup" component={Signup} />
@@ -39,7 +37,6 @@ ReactDOM.render(
             <Route exact path="/my-profile" component={MyProfile} />
           </Switch>
         </div>
-        {/* <Footer/> */}
       </BrowserRouter>
     </Provider>
   </React.StrictMode>,

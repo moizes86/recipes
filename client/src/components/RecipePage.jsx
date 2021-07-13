@@ -25,16 +25,16 @@ const RecipePage = () => {
     getRecipeAsync(id);
   }, [id]);
   return (
-    <div className="recipe-page mb-5">
+    <div className="recipe-page pb-5 mb-3">
       {!loading && (
         <>
           <div className="row">
-            <div className="col-md-6">
+            <div className="col-sm-6">
               <img src={recipe.image_url} alt="" />
               <PageBackgroundImage img={recipe.image_url} />
             </div>
 
-            <div className="col-md-6">
+            <div className="col-sm-6">
               <RecipeDetails
                 title={recipe.title}
                 description={recipe.description}

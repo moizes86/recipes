@@ -35,6 +35,8 @@ $letter-spacing-soft: 1px;
   letter-spacing: $letter-spacing;
 }
 
+// Custom Classes
+
 .font-smaller {
   font-size: 0.9rem;
 }
@@ -47,6 +49,22 @@ $letter-spacing-soft: 1px;
   height: 85vh;
 }
 
+// .container {
+//   @media #{$break_xs} {
+//     padding-right: 0 !important;
+//     padding-left: 0 !important;
+//   }
+
+//   @media #{$break_sm} {
+//     padding-right: 15px;
+//     padding-left: 15px;
+//   }
+
+//   @media #{$break_md},#{$break_lg} {
+//     width: 768px;
+//   }
+// }
+
 // Components
 
 .my-navbar {
@@ -54,6 +72,7 @@ $letter-spacing-soft: 1px;
   background-color: $pinkish1;
   color: $pinkish4;
   margin-bottom: 50px;
+  position: relative;
 
   .navbar-brand {
     @include font-abril;
@@ -73,7 +92,6 @@ $letter-spacing-soft: 1px;
   }
 
   @media #{$break_xs}, #{$break_sm} {
-    margin-right: -1px;
   }
   @media #{$break_sm} {
     margin-bottom: 10px;
@@ -109,6 +127,17 @@ $letter-spacing-soft: 1px;
 
 .my-jumbotron {
   text-align: center;
+
+  .background-img {
+    height: 100vh;
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-image: url("../assets/jumbo-bg.jpg");
+    background-size: cover;
+  }
   h1,
   h4 {
     @include font-abril;
@@ -122,32 +151,48 @@ $letter-spacing-soft: 1px;
     display: flex;
     flex-direction: column;
     align-items: center;
+
+    p{
+      margin-top: 20px;
+    }
+    
+    @media #{$break_lg} {
+      transform: scale(1.2);
+    }
   }
 
   @media #{$break_xs} {
     .container {
-      margin-top:30px;
+      margin-top: 30px;
       width: 100%;
-      padding:0;
+      padding: 0;
     }
   }
   @media #{$break_sm} {
-    transform: scale(0.9);
-    margin-top: -40px;
     .container {
       width: 100%;
+    }
+  }
+
+  @media #{$break_lg} {
+    margin-left: -200px;
+    .container {
+      width: 60%;
     }
   }
 
   @media #{$break_md}, #{$break_lg} {
     margin-top: 100px;
-    .container {
-      width: 60%;
+    p {
+      font-size: 1.3rem;
     }
   }
+  
 }
 
 .gallery {
+  margin-top: 50px;
+
   .cards-container {
     display: flex;
     flex-wrap: wrap;
@@ -156,13 +201,15 @@ $letter-spacing-soft: 1px;
 }
 
 .footer {
-  min-height: 50px;
   background-color: $pinkish4;
   color: $pinkish1;
-  margin-top: 60px;
   padding: 40px 5px;
-  margin-right: -1px;
   text-align: center;
+  clear: both;
+  position: relative;
+  height: 100px;
+  margin-top: -100px;
+  letter-spacing: $letter-spacing-soft;
 }
 
 .custom-button-container {
@@ -197,12 +244,17 @@ $letter-spacing-soft: 1px;
 .recipe-page {
   margin: auto;
   border-radius: 10px;
-  // position: relative;
   background-color: $bg-color;
   letter-spacing: $letter-spacing-soft;
 
   @media #{$break_md}, #{$break_lg} {
     width: 750px;
+    padding: 40px;
+  }
+  @media #{$break_xs}, #{$break_sm} {
+    .recipe-details {
+      padding: 20px;
+    }
   }
 
   img {

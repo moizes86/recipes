@@ -19,7 +19,7 @@ import Login from "./components/Login";
 // Styles
 import "bootstrap/dist/css/bootstrap.css";
 import "./index.scss";
-import "./settings.scss";
+import "./styles/styles.scss";
 import Footer from "./components/Footer";
 
 
@@ -29,8 +29,7 @@ ReactDOM.render(
     <Provider store={store}>
       <BrowserRouter>
         <Navbar />
-        <div className="background-img"/>
-        <div className="container-md">
+        <div className="container">
           <Switch>
             <Route exact path="/" component={App} />
             <Route exact path="/signup" component={Signup} />
@@ -40,7 +39,7 @@ ReactDOM.render(
             <Route exact path="/my-profile" component={MyProfile} />
           </Switch>
         </div>
-        <Footer/>
+        {/* <Footer/> */}
       </BrowserRouter>
     </Provider>
   </React.StrictMode>,

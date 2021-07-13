@@ -25,7 +25,7 @@ const RecipePage = () => {
     getRecipeAsync(id);
   }, [id]);
   return (
-    <div className="recipe-page p-5 mb-5">
+    <div className="recipe-page mb-5">
       {!loading && (
         <>
           <div className="row">
@@ -48,10 +48,13 @@ const RecipePage = () => {
             </div>
           </div>
 
-          <div className="mt-5" />
-          <RecipeIngredients ingredients={recipe.ingredients} />
-          <div className="mt-4" />
-          <RecipeInstructions instructions={recipe.instructions} />
+          <div className="px-3">
+            <div className="mt-5">
+              <RecipeIngredients ingredients={recipe.ingredients} />
+            </div>
+            <div className="my-4" />
+            <RecipeInstructions instructions={recipe.instructions} />
+          </div>
         </>
       )}
     </div>

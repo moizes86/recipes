@@ -70,6 +70,7 @@ const RecipeForm = () => {
   const getRecipeAsync = async () => {
     let { data } = await getRecipe(3);
 
+    debugger
     data.dietsSelected = data.dietsSelected.map((diet) => diet.id);
     data.categoriesSelected = data.categoriesSelected.map((category) => category.id);
 

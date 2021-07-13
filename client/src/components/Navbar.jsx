@@ -13,7 +13,7 @@ const Navbar = () => {
   const activeUser = useSelector((state) => state.activeUser);
 
   return (
-    <nav className="my-navbar navbar navbar-expand-md mb-5">
+    <nav className="my-navbar navbar navbar-expand-md">
       <div className="container ">
         <span className="navbar-brand mr-4" onClick={() => history.push("/")}>
           Recipes Farm

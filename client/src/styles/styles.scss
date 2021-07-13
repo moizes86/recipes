@@ -43,13 +43,17 @@ $letter-spacing-soft: 1px;
   font-weight: 600;
 }
 
+.full-height {
+  height: 85vh;
+}
+
 // Components
 
 .my-navbar {
   letter-spacing: $letter-spacing;
   background-color: $pinkish1;
   color: $pinkish4;
-  // position: relative;
+  margin-bottom: 50px;
 
   .navbar-brand {
     @include font-abril;
@@ -70,6 +74,9 @@ $letter-spacing-soft: 1px;
 
   @media #{$break_xs}, #{$break_sm} {
     margin-right: -1px;
+  }
+  @media #{$break_sm} {
+    margin-bottom: 10px;
   }
 }
 
@@ -101,17 +108,7 @@ $letter-spacing-soft: 1px;
 }
 
 .my-jumbotron {
-  height: 100vh;
-  padding-top: 250px;
-  position: absolute;
-  z-index: -1;
-  top: 0;
-  left: 0;
-  right: 0;
-  background-image: url("../assets/jumbo-bg.jpg");
-  background-size: cover;
   text-align: center;
-
   h1,
   h4 {
     @include font-abril;
@@ -125,25 +122,32 @@ $letter-spacing-soft: 1px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 60%;
   }
 
   @media #{$break_xs} {
     .container {
+      margin-top:30px;
       width: 100%;
+      padding:0;
     }
   }
   @media #{$break_sm} {
-    padding-top: 170px;
-    height: 125vh;
+    transform: scale(0.9);
+    margin-top: -40px;
     .container {
       width: 100%;
+    }
+  }
+
+  @media #{$break_md}, #{$break_lg} {
+    margin-top: 100px;
+    .container {
+      width: 60%;
     }
   }
 }
 
 .gallery {
-  margin-top: 90vh;
   .cards-container {
     display: flex;
     flex-wrap: wrap;
@@ -159,7 +163,6 @@ $letter-spacing-soft: 1px;
   padding: 40px 5px;
   margin-right: -1px;
   text-align: center;
-
 }
 
 .custom-button-container {
@@ -266,7 +269,7 @@ $letter-spacing-soft: 1px;
 
 .recipe-form {
   max-width: 576px;
-  font-family: 'Lato';
+  font-family: "Lato";
 
   .input-file {
     border: 1px solid #ced4da;

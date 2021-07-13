@@ -1,5 +1,5 @@
 import React from "react";
-import "./App.scss";
+import "./styles/styles.scss";
 
 // Components
 import Gallery from "./components/Gallery";
@@ -9,8 +9,10 @@ import Search from "./components/Search";
 function App() {
   return (
     <div className="App">
-      <Search />
-      <Jumbotron />
+      <div className="full-height">
+        <Search />
+        <Jumbotron />
+      </div>
       <Gallery />
     </div>
   );

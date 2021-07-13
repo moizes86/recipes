@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  font-family: "Oswald","Lato", "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+  font-family: "Oswald", "Lato", "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
     "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -10,7 +10,6 @@ body {
   min-height: 100vh;
 }
 
-
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
@@ -18,4 +17,15 @@ code {
 a {
   text-decoration: none;
   color: inherit;
+}
+
+.background-img {
+  height: 100vh;
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-image: url("./assets/jumbo-bg.jpg");
+  background-size: cover;
 }

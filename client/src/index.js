@@ -29,6 +29,7 @@ ReactDOM.render(
     <Provider store={store}>
       <BrowserRouter>
         <Navbar />
+        <div className="background-img"/>
         <div className="container-md">
           <Switch>
             <Route exact path="/" component={App} />

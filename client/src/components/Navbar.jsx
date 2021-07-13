@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 
 // Redux
@@ -11,26 +11,25 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const history = useHistory();
   const activeUser = useSelector((state) => state.activeUser);
+  const [collapsed, setCollapsed] = useState(true);
 
   return (
     <nav className="my-navbar navbar navbar-expand-md">
-      <div className="container ">
-        <span className="navbar-brand mr-4" onClick={() => history.push("/")}>
+      <div className="container">
+        <span className="navbar-brand mr-4" onClick={() => {history.push("/"); setCollapsed(true)}} >
           Recipes Farm
         </span>
         <button
           className="navbar-toggler"
-          type="button"
-          data-toggle="collapse"
-          data-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
+          onClick={(e) => {
+            e.stopPropagation();
+            setCollapsed(!collapsed);
+          }}
         >
           <span className="navbar-toggler-icon custom-toggler"></span>
         </button>
-        <div className="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul className="navbar-nav justify-content-end w-100">
+        <div className={`navbar-collapse ${collapsed && "collapse"}`} id="navbarSupportedContent">
+          <ul className="navbar-nav justify-content-end w-100" onClick={() => setCollapsed(true)}>
             {activeUser && (
               <li className="nav-link " onClick={() => history.push("/add-recipe")}>
                 New Recipe

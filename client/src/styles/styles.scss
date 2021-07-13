@@ -56,6 +56,8 @@ $letter-spacing-soft: 1px;
   opacity: 0;
 }
 
+
+
 // Components
 
 .my-navbar {
@@ -65,6 +67,23 @@ $letter-spacing-soft: 1px;
   margin-bottom: 50px;
   position: relative;
 
+  @media #{$break_sm}, #{$break_xs}{
+    ul{
+      position: absolute;
+      z-index:5;
+      background-color: $pinkish1;
+      left:0;
+      padding-left: 50px;
+      padding-bottom: 25px;
+  
+      @media #{$break_xs}{
+        padding-left: 20px;
+      }
+    }
+
+  }
+
+  
   .navbar-brand {
     @include font-abril;
   }

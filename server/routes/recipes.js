@@ -65,7 +65,6 @@ router.get("/categories", async (req, res) => {
   }
 });
 
-
 router.post("/add-recipe", async (req, res) => {
   try {
     let {
@@ -123,7 +122,7 @@ router.post("/add-recipe", async (req, res) => {
 router.put("/edit-recipe", async (req, res) => {
   try {
     let {
-      id:recipe_id,
+      id: recipe_id,
       title,
       description,
       source,
@@ -151,16 +150,7 @@ router.put("/edit-recipe", async (req, res) => {
     // End validate values
 
     // Add to recipes table
-    await recipesAPI.updateRecipe(
-      recipe_id,
-      title,
-      description,
-      source,
-      source_url,
-      servings,
-      cook,
-      image
-    );
+    await recipesAPI.updateRecipe(recipe_id, title, description, source, source_url, servings, cook, image);
 
     // Ingredients
     await ingredientsDeleted.forEach((ingredientId) => recipesAPI.deleteIngredients(ingredientId));
@@ -179,6 +169,16 @@ router.put("/edit-recipe", async (req, res) => {
     await recipesAPI.addCategories(recipe_id, categoriesSelected);
 
     res.status(200).send("OK");
+  } catch (e) {
+    res.status(500).json({ err: e.message });
+  }
+});
+
+router.get("/my-recipes?:id", async (req, res) => {
+  const { userId } = req.query;
+  try {
+    const [result] = await recipesAPI.getMyRecipes(userId);
+    res.status(200).json(result);
   } catch (e) {
     res.status(500).json({ err: e.message });
   }

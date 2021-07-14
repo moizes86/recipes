@@ -56,6 +56,7 @@ router.put("/update-details", async (req, res) => {
     validationsAPI.confirmPassword(confirmPassword, password);
 
     const [result] = await usersAPI.updateDetails(id, username, password);
+    
     res.status(200).json(result);
   } catch (e) {
     res.status(500).json({ err: e.message });

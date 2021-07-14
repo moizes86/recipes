@@ -68,10 +68,7 @@ const recipesAPI = {
 
   async getRecipe(recipeId) {
     try {
-      const [result] = await promisePool.execute(
-        "SELECT * FROM recipesapp.recipes WHERE (id = ?);",
-        [recipeId]
-      );
+      const [result] = await promisePool.execute("SELECT * FROM recipesapp.recipes WHERE (id = ?);", [recipeId]);
       return result[0];
     } catch (e) {
       return e;
@@ -95,11 +92,10 @@ const recipesAPI = {
 
   async getInstructionsForRecipe(recipeId) {
     try {
-      let [result] = await promisePool.execute(
-        "SELECT * FROM recipesapp.instructions \
-        WHERE recipe_id = ? ;",
-        [recipeId]
-      );
+      let [result] = await promisePool.execute("SELECT * FROM recipesapp.instructions \
+        WHERE recipe_id = ? ;", [
+        recipeId,
+      ]);
       return result;
     } catch (e) {
       return e;
@@ -263,9 +259,7 @@ const recipesAPI = {
 
   async deleteIngredients(ingredientId) {
     try {
-      promisePool.execute("DELETE FROM recipesapp.ingredients WHERE id = ? ;", [
-        ingredientId,
-      ]);
+      promisePool.execute("DELETE FROM recipesapp.ingredients WHERE id = ? ;", [ingredientId]);
     } catch (e) {
       return e;
     }
@@ -273,9 +267,7 @@ const recipesAPI = {
 
   async deleteInstructions(instructionId) {
     try {
-      promisePool.execute("DELETE FROM recipesapp.instructions WHERE id = ? ;", [
-        instructionId,
-      ]);
+      promisePool.execute("DELETE FROM recipesapp.instructions WHERE id = ? ;", [instructionId]);
     } catch (e) {
       return e;
     }
@@ -287,17 +279,28 @@ const recipesAPI = {
         "UPDATE recipesapp.recipes SET \
         title = ?, description =? , source=?, source_url=?, servings=?, cook=?, image_url=? \
         WHERE id = ?",
-        [
-          title,
-          description,
-          source ?? null,
-          url ?? null,
-          servings ?? null,
-          cook ?? null,
-          image ?? null,
-          recipeId,
-        ]
+        [title, description, source ?? null, url ?? null, servings ?? null, cook ?? null, image ?? null, recipeId]
       ));
+    } catch (e) {
+      return e;
+    }
+  },
+
+  async editIngredient(id, amount) {
+    try {
+      return ([result] = await promisePool.execute(
+        "UPDATE recipesapp.ingredients SET amount= ? \
+        WHERE id = ?",
+        [amount, id]
+      ));
+    } catch (e) {
+      return e;
+    }
+  },
+
+  async getMyRecipes(id) {
+    try {
+      return ([result] = await promisePool.execute("SELECT * FROM recipesapp.recipes  WHERE user_id=?", [id]));
     } catch (e) {
       return e;
     }

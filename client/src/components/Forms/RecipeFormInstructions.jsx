@@ -1,25 +1,26 @@
 import React, { useState } from "react";
 
 import InputField from "./InputField";
-import RecipeFormItems from "./RecipeFormItems";
+// import RecipeFormItems from "./RecipeFormItems";
+import RecipeInstructions from "../RecipeInstructions";
 import "../../styles/styles.scss";
 
 const RecipeFormInstructions = ({ instructions, addItem, removeItem }) => {
   const [instruction, setInstruction] = useState({
-    id:null,
-    text:''
+    id: null,
+    text: "",
   });
   const [error, setError] = useState("");
 
   const handleChange = ({ target: { id, value } }) => {
-    setInstruction({id, text:value});
+    setInstruction({ id, text: value });
   };
 
   const addInstruction = (e) => {
     e.preventDefault();
-    if (instruction) {
-      addItem(instruction , "instructions");
-      setInstruction({id:'', text:''});
+    if (instruction.text.length) {
+      addItem(instruction, "instructions");
+      setInstruction({ id: "", text: "" });
       if (error) setError("");
     } else {
       setError("Required");
@@ -27,24 +28,24 @@ const RecipeFormInstructions = ({ instructions, addItem, removeItem }) => {
   };
 
   return (
-    <div className="instructions my-4">
-      <InputField
-        label="* Instructions"
-        // name="instruction"
-        type="text"
-        placeholder="What should be done next"
-        value={instruction.text}
-        required={false}
-        shrinkLabel={false}
-        classes="font-bolder pl-0"
-        handleChange={handleChange}
-      />
+    <div className="recipe-form-instructions my-4">
+      <div className="row align-items-center">
+        <div className="flex-grow-1 col">
+          <InputField
+            label="* Instructions"
+            type="text"
+            placeholder="What should be done next"
+            value={instruction.text}
+            required={false}
+            shrinkLabel={false}
+            classes="font-bolder pl-0 "
+            handleChange={handleChange}
+          />
+        </div>
+        <i className="pr-3 fas fa-plus" onClick={addInstruction}></i>
+      </div>
 
-      <RecipeFormItems title="instructions" items={instructions} removeItem={removeItem} />
-
-      <button className="btn btn-primary mr-4" onClick={addInstruction}>
-        Add
-      </button>
+      <RecipeInstructions instructions={instructions} removeItem={removeItem} partOfForm={true}/>
 
       <small>{error}</small>
     </div>

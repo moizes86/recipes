@@ -55,6 +55,8 @@ const MyProfile = () => {
     const updateResponse = await updateUserDetails({ id, username, password, confirmPassword });
     if (updateResponse.status === 200) {
       setUpdateSuccess(true);
+      dispatch(onUpdateUser());
+      
     } else {
       setErrors("Something went wrong");
     }

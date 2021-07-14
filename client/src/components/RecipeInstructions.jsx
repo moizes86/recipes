@@ -1,14 +1,25 @@
 import React from "react";
 
-const RecipeInstructions = ({ instructions }) => {
+const RecipeInstructions = ({ instructions, removeItem, partOfForm = false }) => {
   return (
     <>
-      <h5>Instructions</h5>
-      <ul>
+      <ol>
         {instructions.map((instruction, i) => (
-          <li key={`${instruction.id}-${i}`}>{instruction.text}</li>
+          <div key={`${instruction.id}-${i}`} className="d-flex align-items-center justify-content-between">
+            <li className="py-1">{instruction.text}</li>
+
+            {partOfForm && (
+              <i
+                className="far fa-trash-alt"
+                onClick={removeItem}
+                id={instruction.id}
+                title={"instructions"}
+                index={i}
+              ></i>
+            )}
+          </div>
         ))}
-      </ul>
+      </ol>
     </>
   );
 };

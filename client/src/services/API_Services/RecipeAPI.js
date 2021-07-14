@@ -37,3 +37,7 @@ export const editRecipe = async (data) => {
 export const searchRecipe = async (data) => {
   return await httpGet(`${url}/search?q=${data}`);
 };
+
+export const getMyRecipes = async (id) =>{
+  return await httpGet(`${url}/my-recipes?userId=${id}`)
+}

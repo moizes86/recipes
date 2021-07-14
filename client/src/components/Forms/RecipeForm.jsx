@@ -18,12 +18,15 @@ import Ingredients from "./RecipeFormIngredients";
 import Instructions from "./RecipeFormInstructions";
 import ImageUpload from "./ImageUpload";
 
+import { useParams } from "react-router-dom";
+
 import "../../styles/styles.scss";
 
 const { validationsAPI } = require("../../DAL/validations");
 
 const RecipeForm = () => {
   const location = useLocation();
+  const params = useParams();
 
   const [values, setValues] = useState({
     user_id: 1,
@@ -36,8 +39,8 @@ const RecipeForm = () => {
     categoriesSelected: [],
     ingredients: [],
     instructions: [],
-    cook: '',
-    servings: '',
+    cook: "",
+    servings: "",
   });
 
   const [errors, setErrors] = useState({
@@ -66,11 +69,10 @@ const RecipeForm = () => {
       categories: options[2],
     });
   };
-
   const getRecipeAsync = async () => {
-    let { data } = await getRecipe(3);
+    const {recipeId} = params;
+    let { data } = await getRecipe(recipeId);
 
-    debugger
     data.dietsSelected = data.dietsSelected.map((diet) => diet.id);
     data.categoriesSelected = data.categoriesSelected.map((category) => category.id);
 
@@ -83,7 +85,7 @@ const RecipeForm = () => {
   useEffect(() => {
     getOptionsAsync();
 
-    if (location.pathname === "/edit-recipe") {
+    if (location.pathname.includes("/edit-recipe")) {
       getRecipeAsync();
     }
   }, [location]);
@@ -111,11 +113,11 @@ const RecipeForm = () => {
       title,
       id,
       attributes: {
-        index: { value: index },
+        index: { value },
       },
     },
   }) => {
-    values[title].splice(index, 1);
+    values[title].splice(value, 1);
 
     // On update, deleted item id will be used in db
     if (id) {
@@ -159,117 +161,219 @@ const RecipeForm = () => {
   };
   return (
     <form className="recipe-form " onSubmit={handleSubmit}>
-      <div className="form-row">
-        <InputField
-          label="* Recipe name (title)"
-          name="title"
-          type="text"
-          placeholder="Enter recipe name"
-          value={values.title}
-          shrinkLabel={false}
-          errors={errors.title}
-          classes="font-bolder pl-0"
-          cols="col col-md-6"
-          handleChange={handleChange}
-        />
+      <div className="accordion" id="accordionExample">
+        <div className="card">
+          <div className="card-header" id="headingOne">
+            <h2 className="mb-0">
+              <button
+                className="btn btn-link btn-block text-left"
+                type="button"
+                data-toggle="collapse"
+                data-target="#collapseOne"
+                aria-expanded="true"
+                aria-controls="collapseOne"
+              >
+                General Details
+              </button>
+            </h2>
+          </div>
 
-        <InputField
-          label="Source"
-          name="source"
-          type="text"
-          placeholder="Where is this from?"
-          value={values.source}
-          required={false}
-          shrinkLabel={false}
-          classes="font-bolder  pl-0"
-          cols="col-12 col-md-6"
-          handleChange={handleChange}
-        />
+          <div id="collapseOne" className="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+            <div className="card-body">
+              <div className="form-row">
+                <InputField
+                  label="* Recipe name (title)"
+                  name="title"
+                  type="text"
+                  placeholder="Enter recipe name"
+                  value={values.title}
+                  shrinkLabel={false}
+                  errors={errors.title}
+                  classes="font-bolder pl-0"
+                  cols="col col-md-6"
+                  handleChange={handleChange}
+                />
+
+                <InputField
+                  label="Source"
+                  name="source"
+                  type="text"
+                  placeholder="Where is this from?"
+                  value={values.source}
+                  required={false}
+                  shrinkLabel={false}
+                  classes="font-bolder  pl-0"
+                  cols="col-12 col-md-6"
+                  handleChange={handleChange}
+                />
+              </div>
+
+              <InputField
+                label="Link To Source"
+                name="source_url"
+                type="text"
+                placeholder="Enter a valid link"
+                value={values.source_url}
+                errors={errors.source_url}
+                required={false}
+                shrinkLabel={false}
+                classes="font-bolder col col-md-6 pl-0"
+                handleChange={handleChange}
+              />
+
+              <div className="form-group">
+                <label className="form-label font-bolder" htmlFor="description">
+                  * General description, will be presented below the title
+                </label>
+                <textarea
+                  className="form-control "
+                  id="description"
+                  name="description"
+                  value={values.description}
+                  rows="3"
+                  // required
+                  onChange={handleChange}
+                ></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="card-header" id="headingTwo">
+            <h2 className="mb-0">
+              <button
+                className="btn btn-link btn-block text-left collapsed"
+                type="button"
+                data-toggle="collapse"
+                data-target="#collapseTwo"
+                aria-expanded="true"
+                aria-controls="collapseTwo"
+              >
+                Options
+              </button>
+            </h2>
+          </div>
+          <div id="collapseTwo" className="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+            <div className="card-body">
+              <InputCheckbox
+                title="Diets:"
+                name="dietsSelected"
+                items={options.diets}
+                itemsSelected={values.dietsSelected}
+                handleCheck={handleCheck}
+              />
+
+              <div className="my-2"></div>
+              <InputCheckbox
+                title="Categories:"
+                name="categoriesSelected"
+                items={options.categories}
+                itemsSelected={values.categoriesSelected}
+                handleCheck={handleCheck}
+              />
+
+              <div className="form-row mt-3">
+                <InputField
+                  label="Cook"
+                  name="cook"
+                  type="number"
+                  value={values.cook}
+                  required={false}
+                  shrinkLabel={false}
+                  classes="font-bolder"
+                  cols="col col-sm-2"
+                  handleChange={handleChange}
+                />
+                <InputField
+                  label="Servings"
+                  name="servings"
+                  type="number"
+                  value={values.servings}
+                  max={10}
+                  required={false}
+                  shrinkLabel={false}
+                  classes="font-bolder"
+                  cols="col-sm-2 col"
+                  handleChange={handleChange}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="card-header" id="headingThree">
+            <h2 className="mb-0">
+              <button
+                className="btn btn-link btn-block text-left collapsed"
+                type="button"
+                data-toggle="collapse"
+                data-target="#collapseThree"
+                aria-expanded="false"
+                aria-controls="collapseThree"
+              >
+                Ingredients
+              </button>
+            </h2>
+          </div>
+          <div id="collapseThree" className="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
+            <div className="card-body">
+              <Ingredients
+                measuringUnits={options.measuringUnits}
+                ingredients={values.ingredients}
+                submitError={errors.ingredients}
+                addItem={addItem}
+                removeItem={removeItem}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="card-header" id="headingFour">
+            <h2 className="mb-0">
+              <button
+                className="btn btn-link btn-block text-left collapsed"
+                type="button"
+                data-toggle="collapse"
+                data-target="#collapseFour"
+                aria-expanded="false"
+                aria-controls="collapseFour"
+              >
+                Instructions
+              </button>
+            </h2>
+          </div>
+          <div id="collapseFour" className="collapse" aria-labelledby="headingFour" data-parent="#accordionExample">
+            <div className="card-body">
+              <Instructions instructions={values.instructions} addItem={addItem} removeItem={removeItem} />
+            </div>
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="card-header" id="headingFive">
+            <h2 className="mb-0">
+              <button
+                className="btn btn-link btn-block text-left collapsed"
+                type="button"
+                data-toggle="collapse"
+                data-target="#collapseFive"
+                aria-expanded="false"
+                aria-controls="collapseFive"
+              >
+                Add Image
+              </button>
+            </h2>
+          </div>
+          <div id="collapseFive" className="collapse" aria-labelledby="headingFive" data-parent="#accordionExample">
+            <div className="card-body">
+              <ImageUpload addImage={addImage} removeImage={removeImage} image={values.image} />
+            </div>
+          </div>
+        </div>
       </div>
-
-      <InputField
-        label="Link To Source"
-        name="source_url"
-        type="text"
-        placeholder="Enter a valid link"
-        value={values.source_url}
-        errors={errors.source_url}
-        required={false}
-        shrinkLabel={false}
-        classes="font-bolder col col-md-6 pl-0"
-        handleChange={handleChange}
-      />
-
-
-      <div className="form-group">
-        <label className="form-label font-bolder" htmlFor="description">
-          * General description, will be presented below the title
-        </label>
-        <textarea
-          className="form-control "
-          id="description"
-          name="description"
-          value={values.description}
-          rows="3"
-          // required
-          onChange={handleChange}
-        ></textarea>
-      </div>
-
-      <ImageUpload addImage={addImage} removeImage={removeImage} image={values.image} />
-
-      <InputCheckbox
-        title="Diets:"
-        name="dietsSelected"
-        items={options.diets}
-        itemsSelected={values.dietsSelected}
-        handleCheck={handleCheck}
-      />
-
-      <div className="my-2"></div>
-      <InputCheckbox
-        title="Categories:"
-        name="categoriesSelected"
-        items={options.categories}
-        itemsSelected={values.categoriesSelected}
-        handleCheck={handleCheck}
-      />
-
-      <div className="form-row mt-3">
-        <InputField
-          label="Cook"
-          name="cook"
-          type="number"
-          value={values.cook}
-          required={false}
-          shrinkLabel={false}
-          classes="font-bolder"
-          cols="col col-sm-2"
-          handleChange={handleChange}
-        />
-        <InputField
-          label="Servings"
-          name="servings"
-          type="number"
-          value={values.servings}
-          max={10}
-          required={false}
-          shrinkLabel={false}
-          classes="font-bolder"
-          cols="col-sm-2 col"
-          handleChange={handleChange}
-        />
-      </div>
-
-      <Ingredients
-        measuringUnits={options.measuringUnits}
-        ingredients={values.ingredients}
-        submitError={errors.ingredients}
-        addItem={addItem}
-        removeItem={removeItem}
-      />
-
-      <Instructions instructions={values.instructions} addItem={addItem} removeItem={removeItem} />
 
       <button className="btn btn-primary mt-3" type="submit">
         {location.pathname === "/add-recipe" ? "Add" : "Edit"} Recipe

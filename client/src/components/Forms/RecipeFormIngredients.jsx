@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 
 import InputField from "./InputField";
-import RecipeFormItems from "./RecipeFormItems";
 import "../../styles/styles.scss";
+import RecipeIngredients from "../RecipeIngredients";
 
 const RecipeFormIngredients = ({ measuringUnits, ingredients, addItem, removeItem, submitError }) => {
   const [values, setValues] = useState({
@@ -17,7 +17,7 @@ const RecipeFormIngredients = ({ measuringUnits, ingredients, addItem, removeIte
     e.preventDefault();
     const { amount, unitId, text } = values;
     if (amount && text) {
-      addItem({ amount, unitId, text }, "ingredients");
+      addItem({ amount, unitId, text, unit: measuringUnits[values.unitId - 1]?.unit }, "ingredients");
       setValues({ amount: 1, unitId: "DEFAULT", text: "" });
       if (error) setError("");
     } else {
@@ -31,8 +31,7 @@ const RecipeFormIngredients = ({ measuringUnits, ingredients, addItem, removeIte
 
   return (
     <div className="recipe-form-ingredients my-4">
-      <p className="font-bolder">* Ingredients:</p>
-      <div className=" d-flex font-smaller row">
+      <div className="font-smaller row align-items-center pr-3">
         <InputField
           label="Amount"
           name="amount"
@@ -41,19 +40,19 @@ const RecipeFormIngredients = ({ measuringUnits, ingredients, addItem, removeIte
           required={true}
           shrinkLabel={false}
           classes="font-bolder"
-          cols="col-3 col-sm-2"
+          cols="col col-sm-3"
           handleChange={handleChange}
         />
 
-        <div className="form-group mr-2 narrow" controlid="measurement">
+        <div className="form-group mr-2" controlid="measurement">
           <label className="form-label font-bolder"> Units</label>
           <select
-            className="form-control"
+            className="form-control "
             value={values.unitId}
-            defaultValue="DEFAULT"
             name="unitId"
             onChange={handleChange}
             required
+            
           >
             <option disabled value="DEFAULT">
               --
@@ -66,32 +65,25 @@ const RecipeFormIngredients = ({ measuringUnits, ingredients, addItem, removeIte
           </select>
         </div>
 
-        <div className="form-group flex-grow-1" controlid="text">
+        <div className=" flex-grow-1" controlid="text">
           <InputField
             label="Notes"
             type="text"
             name="text"
             placeholder="Example: soaked in vinegar"
             value={values.text}
-            cols='col'
+            cols="col"
             required={false}
             shrinkLabel={false}
             classes="form-label font-bolder"
             handleChange={handleChange}
           />
         </div>
+        <i className="fas fa-plus" onClick={handleIngredient}></i>
       </div>
 
-      <RecipeFormItems
-        title="ingredients"
-        items={ingredients}
-        measuringUnits={measuringUnits}
-        removeItem={removeItem}
-      />
+      <RecipeIngredients ingredients={ingredients} removeItem={removeItem} partOfForm={true}/>
 
-      <button className="btn btn-primary mr-3" onClick={handleIngredient}>
-        Add
-      </button>
       <small>{error || submitError}</small>
     </div>
   );

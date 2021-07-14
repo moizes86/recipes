@@ -61,7 +61,7 @@ const validationsAPI = {
   ingredients(ingredients) {
     if (!ingredients.length) throw Error("Ingredients are required");
     ingredients.forEach((ingredient) => {
-      if (!ingredient.text || ingredient.amount < 0.5)  throw Error("Invalid ingredient");
+      if (!ingredient.text || ingredient.amount <=0)  throw Error("Invalid ingredient");
     });
   },
 

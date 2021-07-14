@@ -16,7 +16,13 @@ const Navbar = () => {
   return (
     <nav className="my-navbar navbar navbar-expand-md">
       <div className="container">
-        <span className="navbar-brand mr-4" onClick={() => {history.push("/"); setCollapsed(true)}} >
+        <span
+          className="navbar-brand mr-4"
+          onClick={() => {
+            history.push("/");
+            setCollapsed(true);
+          }}
+        >
           Recipes Farm
         </span>
         <button
@@ -31,9 +37,14 @@ const Navbar = () => {
         <div className={`navbar-collapse ${collapsed && "collapse"}`} id="navbarSupportedContent">
           <ul className="navbar-nav justify-content-end w-100" onClick={() => setCollapsed(true)}>
             {activeUser && (
-              <li className="nav-link " onClick={() => history.push("/add-recipe")}>
-                New Recipe
-              </li>
+              <>
+                <li className="nav-link " onClick={() => history.push("/add-recipe")}>
+                  New Recipe
+                </li>
+                <li className="nav-link " onClick={() => history.push("/my-recipes")}>
+                  My Recipes
+                </li>
+              </>
             )}
             {activeUser && (
               <div className="d-md-flex ml-md-auto">

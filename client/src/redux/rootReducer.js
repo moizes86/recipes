@@ -1,4 +1,4 @@
-const initialState = { activeUser: false, loading: false, recipes: [] };
+const initialState = { activeUser: {id:1}, loading: false, recipes: [] };
 
 const rootReducer = (state = initialState, action) => {
   switch (action.type) {

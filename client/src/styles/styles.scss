@@ -32,7 +32,7 @@ $letter-spacing-soft: 1px;
 
 @mixin font-abril {
   font-family: "Abril Fatface", cursive;
-  letter-spacing: $letter-spacing;
+  letter-spacing: $letter-spacing-soft;
 }
 // Custom Classes
 
@@ -52,38 +52,45 @@ $letter-spacing-soft: 1px;
   display: none;
 }
 
-.transparent{
+.transparent {
   opacity: 0;
 }
 
-
+.container-md {
+  @media #{$break_xs} {
+    .row {
+      margin-right: 0;
+      margin-left: 0;
+    }
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}
 
 // Components
 
 .my-navbar {
-  letter-spacing: $letter-spacing;
+  letter-spacing: $letter-spacing-soft;
   background-color: $pinkish1;
   color: $pinkish4;
   margin-bottom: 50px;
   position: relative;
 
-  @media #{$break_sm}, #{$break_xs}{
-    ul{
+  @media #{$break_sm}, #{$break_xs} {
+    ul {
       position: absolute;
-      z-index:5;
+      z-index: 5;
       background-color: $pinkish1;
-      left:0;
+      left: 0;
       padding-left: 50px;
       padding-bottom: 25px;
-  
-      @media #{$break_xs}{
+
+      @media #{$break_xs} {
         padding-left: 20px;
       }
     }
-
   }
 
-  
   .navbar-brand {
     @include font-abril;
   }
@@ -557,6 +564,46 @@ $letter-spacing-soft: 1px;
 
     li:hover {
       @include my-hover;
+    }
+  }
+}
+
+.recipe-form-ingredients,
+.recipe-form-instructions {
+  .fa-plus {
+    margin-top: 15px;
+  }
+}
+
+.recipe-ingredients,
+.recipe-form-ingredients,
+.recipe-form-instructions {
+  i:hover {
+    @include my-hover;
+  }
+}
+
+.accordion {
+  .btn:focus,
+  .btn.focus {
+    box-shadow: none;
+  }
+}
+
+.my-recipes {
+  table {
+    td {
+      vertical-align: middle;
+      height: 100px;
+
+      img {
+        max-height: 100%;
+      }
+
+      &:hover{
+        @include my-hover;
+      }
+      
     }
   }
 }

@@ -19,8 +19,8 @@ const Gallery = () => {
   }, [dispatch]);
   return (
     <div className="gallery">
-      <h1 className="mb-4">Dishes Bitches!</h1>
-      <div className="cards-container">
+      <h1 className="mb-4 text-center">Recipes</h1>
+      <div className="cards-container px-4">
         {loading
           ? "Loading..."
           : recipes.map((recipe, i) => <RecipePreview key={`${recipe.recipe_name}-${i}`} data={recipe} />)}

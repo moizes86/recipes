@@ -44,7 +44,11 @@ const Search = () => {
           onChange={handleChange}
           autoComplete="off"
           onFocus={() => setInputIsFocused(true)}
-          onBlur={() => setInputIsFocused(false)}
+          onBlur={() =>
+            setTimeout(() => {
+              setInputIsFocused(false);
+            }, 200)
+          }
         />
         <div className="icon">
           <i className="fa fa-search" />

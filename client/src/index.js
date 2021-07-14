@@ -15,6 +15,7 @@ import RecipeForm from "./components/Forms/RecipeForm";
 import MyProfile from "./components/MyProfile";
 import Signup from "./components/Signup";
 import Login from "./components/Login";
+import MyRecipes from './components/MyRecipes';
 
 // Styles
 import "bootstrap/dist/css/bootstrap.css";
@@ -33,8 +34,9 @@ ReactDOM.render(
             <Route exact path="/signup" component={Signup} />
             <Route exact path="/login" component={Login} />
             <Route exact path="/recipes/:id" component={RecipePage} />
-            <Route exact path={["/add-recipe", "/edit-recipe"]} component={RecipeForm} />
+            <Route exact path={["/add-recipe", "/edit-recipe/:recipeId"]} component={RecipeForm} />
             <Route exact path="/my-profile" component={MyProfile} />
+            <Route exact path="/my-recipes" component={MyRecipes} />
           </Switch>
         </div>
       </BrowserRouter>

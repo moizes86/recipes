@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import InputField from "./Forms/InputField";
 import CustomButton from "./CustomButton";
 
-import { validateData } from "../DAL/api";
+import { validationsAPI } from "../DAL/validations";
 
 // Redux
 import { useDispatch, useSelector } from "react-redux";
@@ -11,7 +11,7 @@ import { onLoading, onUpdateUser } from "../redux/actions";
 
 // Routing
 import { history, useHistory } from "react-router-dom";
-import { updateUserDetails } from "../services/API_Services/UserAPI";
+import { getUserById, updateUserDetails } from "../services/API_Services/UserAPI";
 
 const MyProfile = () => {
   const dispatch = useDispatch();
@@ -35,13 +35,13 @@ const MyProfile = () => {
   }, [activeUser, history]);
 
   const handleBlur = ({ target: { name, value } }) => {
-    let error = "";
-    if (name === "confirmPassword") {
-      error = validateData(name, value, values.password);
-    } else {
-      error = validateData(name, value);
+    try {
+      const validate = validationsAPI[name];
+      validate(value, values.password);
+      setErrors({ ...errors, [name]: "" });
+    } catch (e) {
+      setErrors({ ...errors, [name]: e.message });
     }
-    setErrors({ ...errors, [name]: error });
   };
 
   const handleChange = ({ target: { name, value } }) => {
@@ -50,24 +50,32 @@ const MyProfile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch(onLoading(true));
-    const { id, username, password, confirmPassword } = values;
-    const updateResponse = await updateUserDetails({ id, username, password, confirmPassword });
-    if (updateResponse.status === 200) {
-      setUpdateSuccess(true);
-      dispatch(onUpdateUser());
-      
-    } else {
-      setErrors("Something went wrong");
+
+    setErrors({});
+
+    try {
+      validationsAPI.username(values.username);
+      validationsAPI.password(values.password);
+      validationsAPI.confirmPassword(values.confirmPassword, values.password);
+
+      const { id, username, password, confirmPassword } = values;
+      const updateResponse = await updateUserDetails({ id, username, password, confirmPassword });
+      if (updateResponse.status === 200) {
+        setUpdateSuccess(true);
+        dispatch(onUpdateUser({...updateResponse.data}));
+      } else {
+        setErrors("Something went wrong");
+      }
+    } catch (e) {
+      setErrors({ ...errors, [e.field]: e.message });
     }
-    dispatch(onLoading(false));
   };
 
   return loading ? (
     "LOADING"
   ) : (
     <div className="my-profile">
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} noValidate>
         <InputField
           label="Username"
           value={values.username}
@@ -101,7 +109,7 @@ const MyProfile = () => {
 
         {updateSuccess && <p>Update Success</p>}
 
-        <CustomButton disabled={!Object.values(errors).every((el) => el === false)}>Submit</CustomButton>
+        <CustomButton>Submit</CustomButton>
       </form>
     </div>
   );

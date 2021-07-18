@@ -1,4 +1,5 @@
 import React from "react";
+import '../styles/styles.scss';
 
 const RecipeDetails = ({
   title,
@@ -15,17 +16,17 @@ const RecipeDetails = ({
       <h3>{title}</h3>
 
       <div className="col">
-        <p>
+        <p className="mt-4">
           <a href={sourceUrl} target="_blank" rel="noreferrer noopener ">
             {source}
           </a>
         </p>
 
-        <span className="text-capitalize smaller-font">
+        <span className="text-capitalize font-smaller">
           {categoriesSelected.map((category) => category.title).join(",  ")}
         </span>
         <br />
-        <span className="text-capitalize smaller-font">{dietsSelected.map((diet) => diet.title).join(",  ")}</span>
+        <span className="text-capitalize font-smaller">{dietsSelected.map((diet) => diet.title).join(",  ")}</span>
 
         <p className="mt-3">
           <span>{description} </span>

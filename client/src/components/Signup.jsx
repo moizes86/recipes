@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 
+import { validationsAPI } from "../DAL/validations";
+
 import InputField from "./Forms/InputField";
 import CustomButton from "./CustomButton";
 
@@ -12,7 +14,6 @@ import { useDispatch } from "react-redux";
 import { onLoading } from "../redux/actions";
 
 import "../styles/styles.scss";
-
 
 const Signup = () => {
   const dispatch = useDispatch();
@@ -33,15 +34,14 @@ const Signup = () => {
 
   const [signupError, setSignupError] = useState(null);
 
-
   const handleBlur = ({ target: { name, value } }) => {
-    let error = "";
-    if (name === "confirmPassword") {
-      error = validateData(name, value, values.password);
-    } else {
-      error = validateData(name, value);
+    try {
+      const validate = validationsAPI[name];
+      validate(value, values.password);
+      setErrors({ ...errors, [name]: "" });
+    } catch (e) {
+      setErrors({ ...errors, [name]: e.message });
     }
-    setErrors({ ...errors, [name]: error });
   };
 
   const handleChange = ({ target: { name, value } }) => {
@@ -50,20 +50,32 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch(onLoading(true));
 
-    const response = await createUser({ values });
-    if (response.status === 200) {
-    } else {
-      if (response.data.errno === 1062) setSignupError("User already exists");
-      else setSignupError("Well, something went wrong");
+    setErrors({});
+    setSignupError("");
+    
+    try {
+      validationsAPI.email(values.email);
+      validationsAPI.username(values.username);
+      validationsAPI.password(values.password);
+      validationsAPI.confirmPassword(values.confirmPassword, values.password);
+
+      const response = await createUser({ values });
+      if (response.status === 200) {
+      } else {
+        if (response.data.errno === 1062) setSignupError("User already exists");
+        else setSignupError("Well, something went wrong");
+      }
+    } catch (e) {
+      setErrors({ ...errors, [e.field]: e.message });
     }
+
     dispatch(onLoading(false));
   };
 
   return (
     <div className="signup">
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} noValidate>
         <h5>Signup</h5>
         <InputField
           label="Email"
@@ -72,7 +84,6 @@ const Signup = () => {
           value={values.email}
           handleChange={handleChange}
           handleBlur={handleBlur}
-          required={true}
           errors={errors.email}
         />
 
@@ -106,7 +117,7 @@ const Signup = () => {
           errors={errors.confirmPassword}
         />
 
-        <CustomButton disabled={!Object.values(errors).every((el) => el === false)}>Submit</CustomButton>
+        <CustomButton>Submit</CustomButton>
 
         <br />
 

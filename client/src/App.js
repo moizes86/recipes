@@ -1,19 +1,50 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./styles/styles.scss";
 
-// Components
-import Gallery from "./components/Gallery";
-import Jumbotron from "./components/Jumbotron";
-import Search from "./components/Search";
+import { BrowserRouter, Switch, Route } from "react-router-dom";
+// Redux
+import { checkUserLoggedIn } from "./services/API_Services/UserAPI";
+import { useDispatch } from "react-redux";
+
+// import App from "./App";
+import Navbar from "./components/Navbar";
+import RecipePage from "./components/RecipePage";
+import RecipeForm from "./components/Forms/RecipeForm";
+import MyProfile from "./components/MyProfile";
+import Signup from "./components/Signup";
+import Login from "./components/Login";
+import MyRecipes from "./components/MyRecipes";
+import MainPage from "./components/MainPage";
+import { onLogin } from "./redux/actions";
 
 function App() {
+  const dispatch = useDispatch();
+  const checkUserLoggedInAsync = async () => {
+    const result = await checkUserLoggedIn();
+    dispatch(onLogin(result.data));
+  };
+
+  useEffect(() => checkUserLoggedInAsync());
+
   return (
     <div className="App">
-      <div className="full-height">
-        <Search />
-        <Jumbotron />
-      </div>
-      <Gallery />
+      <BrowserRouter>
+        <div className="full-height">
+          <Navbar />
+          <div className="container-md">
+            <Switch>
+              <Route exact path="/" component={MainPage} />
+              <Route exact path="/signup" component={Signup} />
+              <Route exact path="/login" component={Login} />
+              <Route exact path="/recipes/:id" component={RecipePage} />
+              <Route exact path={["/add-recipe", "/edit-recipe/:recipeId"]} component={RecipeForm} />
+              <Route exact path="/my-profile" component={MyProfile} />
+              <Route exact path="/my-recipes" component={MyRecipes} />
+            </Switch>
+          </div>
+        </div>
+        
+      </BrowserRouter>
     </div>
   );
 }

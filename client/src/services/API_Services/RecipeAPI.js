@@ -1,3 +1,4 @@
+import axios from "axios";
 import { httpGet, httpPost, httpPut } from "../CRUD_Service";
 
 const url = "http://localhost:3100/recipes";
@@ -38,6 +39,14 @@ export const searchRecipe = async (data) => {
   return await httpGet(`${url}/search?q=${data}`);
 };
 
-export const getMyRecipes = async (id) =>{
-  return await httpGet(`${url}/my-recipes?userId=${id}`)
-}
+export const getMyRecipes = async (id) => {
+  return await httpGet(`${url}/my-recipes?userId=${id}`);
+};
+
+export const getImages = async (recipe_id) => {
+  return httpGet(`${url}/images?recipe_id=${recipe_id}`);
+};
+
+export const uploadImage = async (image) => {
+  return httpPost(`${url}/images`, image)
+};

@@ -7,7 +7,6 @@ import RecipeInstructions from "./RecipeInstructions";
 
 // STYLES
 import "../styles/styles.scss";
-import { PageBackgroundImage } from "../styles/StyledComponents";
 
 import { useParams } from "react-router-dom";
 import { getRecipe } from "../services/API_Services/RecipeAPI";
@@ -25,13 +24,13 @@ const RecipePage = () => {
     getRecipeAsync(id);
   }, [id]);
   return (
-    <div className="recipe-page py-5 mb-3">
+    <div className="recipe-page py-5">
       {!loading && (
         <>
           <div className="row">
             <div className="col-sm-6">
-              <img src={recipe.image_url} alt="" />
-              <PageBackgroundImage img={recipe.image_url} />
+              <img src={`${process.env.REACT_APP_SERVER_PATH}/${recipe.image_url}`} alt="" />
+              <img className="background-img" src={`${process.env.REACT_APP_SERVER_PATH}/${recipe.image_url}`} alt="" />
             </div>
 
             <div className="col-sm-6">

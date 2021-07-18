@@ -1,36 +1,53 @@
+class CustomError extends Error {
+  constructor(field, ...params) {
+    // Pass remaining arguments (including vendor specific ones) to parent constructor
+    super(...params);
+
+    // Maintains proper stack trace for where our error was thrown (only available on V8)
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, CustomError);
+    }
+    this.name = "CustomError";
+    this.field = field;
+  }
+}
+
 const validationsAPI = {
   required(name, value) {
-    if (!value) throw Error(`${name} is required`);
+    if (!value) throw new CustomError(name, `${name} is required`);
   },
   email(email) {
-    this.required("Email", email);
+    validationsAPI.required("email", email);
     const reg = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
-    if (!reg.test(email)) throw Error("Invalid Email");
+    if (!reg.test(email)) throw new CustomError("email", "Invalid Email");
   },
 
   username(username) {
-    this.required("Username", username);
+    validationsAPI.required("username", username);
     const reg = /^[a-zA-Z]{5,}\S*$/;
     if (!reg.test(username)) {
-      if (username.length < 5) throw Error("Username too short! Minimum 5 chars");
-      if (username.length > 5) throw Error("Username too long! Maximum 20 chars");
+      if (username.length < 5) throw new CustomError("username", "Username too short! Minimum 5 chars");
+      if (username.length > 20) throw new CustomError("username", "Username too long! Maximum 20 chars");
       throw Error("Invalid username");
     }
   },
 
   password(password) {
-    this.required("Password", password);
+    validationsAPI.required("password", password);
     const reg = /^(?=.*[0-9])(?=.*[a-zA-Z]).{6,}$/;
-    if (password.length < 6) throw Error("Password length must be at least six chars");
-    if (!reg.test(password)) throw Error("Invalid password. Must contain numbers and letters");
+    if (password.length < 6) throw new CustomError("password", "Password length must be at least six chars");
+    if (!reg.test(password))
+      throw new CustomError("password", "Invalid password. Must contain numbers and letters");
   },
 
-  confirmPassword(confirmPassword, password) {
-    this.required("Confirm password", confirmPassword);
+  confirmPassword(confirmPassword, password = "") {
+    validationsAPI.required("confirmPassword", confirmPassword);
     const reg = /^(?=.*[0-9])(?=.*[a-zA-Z]).{6,}$/;
-    if (password.length < 6) throw Error("Password length must be at least six chars");
-    if (!reg.test(password)) throw Error("Invalid password. Must contain numbers and letters");
-    if (confirmPassword !== password) throw Error("Passwords do not match");
+    if (confirmPassword.length < 6)
+      throw new CustomError("confirmPassword", "Password length must be at least six chars");
+    if (!reg.test(confirmPassword))
+      throw new CustomError("confirmPassword", "Invalid password. Must contain numbers and letters");
+    if (confirmPassword !== password) throw new CustomError("confirmPassword", "Passwords do not match");
   },
 
   recipeTitle(title) {
@@ -51,7 +68,6 @@ const validationsAPI = {
   cook(n) {
     if (n < 1) throw Error("Invalid cooking time");
   },
-
 
   image(image) {
     const reg = /(http(s?):\/\/)(.)*\.(?:jpe?g|gif|png)/;

@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 
-import { validateData } from "../DAL/api";
-
 // Redux
 import { onLogin } from "../redux/actions";
 import { useDispatch } from "react-redux";
+
+import Cookies from 'js-cookie'
 
 // Routing
 import { useHistory } from "react-router-dom";
@@ -15,6 +15,7 @@ import CustomButton from "./CustomButton";
 import { loginUser } from "../services/API_Services/UserAPI";
 
 import "../styles/styles.scss";
+import { validationsAPI } from "../DAL/validations";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -33,8 +34,13 @@ const Login = () => {
   const [loginError, setLoginError] = useState(null);
 
   const handleBlur = ({ target: { name, value } }) => {
-    const error = validateData(name, value);
-    setErrors({ ...errors, [name]: error });
+    try {
+      const validate = validationsAPI[name];
+      validate(value);
+      setErrors({ ...errors, [name]: "" });
+    } catch (e) {
+      setErrors({ ...errors, [e.field]: e.message });
+    }
   };
 
   const handleChange = ({ target: { name, value } }) => {
@@ -43,20 +49,28 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const result = await loginUser(values);
-    if (!result.data.length) {
-      setLoginError("Invalid user or password");
-    } else {
-      if (loginError) setLoginError("");
-      dispatch(onLogin(...result.data));
-      history.push("/");
+    setErrors({});
+    setLoginError("");
+    try {
+      validationsAPI.email(values.email);
+      validationsAPI.password(values.password);
+      const result = await loginUser(values);
+      
+      if (!result.data.length) {
+        setLoginError("Invalid user or password");
+      } else {
+        if (loginError) setLoginError("");
+        dispatch(onLogin(...result.data));
+        history.push("/");
+      }
+    } catch (e) {
+      setErrors({ ...errors, [e.field]: e.message });
     }
   };
 
   return (
     <div className="login">
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} noValidate>
         <InputField
           label="Email"
           name="email"
@@ -64,7 +78,6 @@ const Login = () => {
           value={values.email}
           handleChange={handleChange}
           handleBlur={handleBlur}
-          required={true}
           errors={errors.email}
         />
 
@@ -75,11 +88,10 @@ const Login = () => {
           value={values.password}
           handleChange={handleChange}
           handleBlur={handleBlur}
-          required={true}
           errors={errors.password}
         />
 
-        <CustomButton disabled={!Object.values(errors).every((el) => el === false)}>Login</CustomButton>
+        <CustomButton>Login</CustomButton>
 
         <br />
 

@@ -15,8 +15,9 @@ const RecipeIngredients = ({ ingredients, removeItem, partOfForm = false }) => {
         </thead>
         <tbody>
           {ingredients.map((ingredient, i) => (
-            <tr key={`${ingredient.text}- ${i}`}>
-              <td className="col-1">{ingredient.amount}</td> <td className="col-1">{ingredient.unit}</td>
+            <tr key={`${ingredient.text}-${i}`}>
+              <td className="col-1">{ingredient.amount}</td>
+              <td className="col-1">{ingredient.unit}</td>
               <td>{ingredient.text}</td>
               {partOfForm && (
                 <td className="remove-item text-right pl-2" onClick={removeItem}>

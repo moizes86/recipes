@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 
 // Redux
@@ -6,13 +6,20 @@ import { useDispatch, useSelector } from "react-redux";
 import { onLogout } from "../redux/actions";
 
 import "../styles/styles.scss";
+import { logoutUser } from "../services/API_Services/UserAPI";
 
 const Navbar = () => {
   const dispatch = useDispatch();
-  const history = useHistory();
   const activeUser = useSelector((state) => state.activeUser);
+  const history = useHistory();
   const [collapsed, setCollapsed] = useState(true);
+  const [userLogged, setUserLogged] = useState(false)
 
+  useEffect(() => {
+    setUserLogged(activeUser)
+  }, [activeUser])
+
+  
   return (
     <nav className="my-navbar navbar navbar-expand-md">
       <div className="container">
@@ -51,7 +58,15 @@ const Navbar = () => {
                 <li className="nav-link  " onClick={() => history.push("/my-profile")}>
                   {activeUser.username}
                 </li>
-                <li className="nav-link " onClick={() => dispatch(onLogout())}>
+                <li
+                  className="nav-link "
+                  onClick={() =>
+                    dispatch(() => {
+                      logoutUser();
+                      dispatch(onLogout());
+                    })
+                  }
+                >
                   Logout
                 </li>
               </div>

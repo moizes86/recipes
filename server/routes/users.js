@@ -1,7 +1,9 @@
 const express = require("express");
-const { usersAPI } = require("../DAL/db");
 const router = express.Router();
+
+const { usersAPI } = require("../DAL/db");
 const { validationsAPI } = require("../DAL/validations");
+const { LoginValidationError } = require("../DAL/Errors");
 
 /* GET users listing. */
 router.get("/", function (req, res, next) {
@@ -38,12 +40,27 @@ router.post("/login", async (req, res) => {
     validationsAPI.email(email);
     validationsAPI.password(password);
 
-    const [result] = await usersAPI.login(email, password);
-
-    res.status(200).json(result);
+    const [user] = await usersAPI.login(email, password);
+    res.cookie("user", user);
+    res.status(200).json(user);
   } catch (e) {
+    if (e instanceof LoginValidationError) {
+      res.status(400).json({ err: "Invalid email or password" });
+      return;
+    }
     res.status(500).json({ err: e.message });
   }
+});
+
+router.get("/login", async (req, res) => {
+  if (req.cookies.user) {
+    res.status(200).send(req.cookies.user[0]);
+  } else res.status(400).send("Not signed in");
+});
+
+router.post("/logout", async (req, res) => {
+  res.clearCookie("user");
+  res.status(200).send("Logged out");
 });
 
 /* Update user's details */
@@ -56,8 +73,7 @@ router.put("/update-details", async (req, res) => {
     validationsAPI.confirmPassword(confirmPassword, password);
 
     const [result] = await usersAPI.updateDetails(id, username, password);
-    
-    res.status(200).json(result);
+    res.status(200).json({ id, username, password, confirmPassword });
   } catch (e) {
     res.status(500).json({ err: e.message });
   }

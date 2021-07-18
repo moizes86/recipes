@@ -1,3 +1,5 @@
+const { LoginValidationError } = require("./Errors");
+
 const validationsAPI = {
   required(name, value) {
     if (!value) throw Error(`${name} is required`);
@@ -5,7 +7,7 @@ const validationsAPI = {
   email(email) {
     this.required("Email", email);
     const reg = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
-    if (!reg.test(email)) throw Error("Invalid Email");
+    if (!reg.test(email)) throw new LoginValidationError("Invalid Email");
   },
 
   username(username) {
@@ -21,8 +23,8 @@ const validationsAPI = {
   password(password) {
     this.required("Password", password);
     const reg = /^(?=.*[0-9])(?=.*[a-zA-Z]).{6,}$/;
-    if (password.length < 6) throw Error("Password length must be at least six chars");
-    if (!reg.test(password)) throw Error("Invalid password. Must contain numbers and letters");
+    if (password.length < 6) throw new LoginValidationError("Password length must be at least six chars");
+    if (!reg.test(password)) throw new LoginValidationError("Invalid password. Must contain numbers and letters");
   },
 
   confirmPassword(confirmPassword, password) {

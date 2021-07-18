@@ -19,12 +19,16 @@ const MyRecipes = () => {
   return (
     <div className="my-recipes">
       <h3 className="text-center mb-4">My Recipes</h3>
-      <table class="table">
+      <table className="table">
         <tbody>
           {recipes.map((recipe, i) => (
-            <tr key={recipe.title} id={recipe.id} onClick={() => history.push(`edit-recipe/${recipe.id}`)}>
+            <tr
+              key={`${recipe.title}-${i}`}
+              id={recipe.id}
+              onClick={() => history.push(`edit-recipe/${recipe.id}`)}
+            >
               <td className="col-1">
-                <img src={recipe?.image_url} alt="" />
+                <img src={`${process.env.REACT_APP_SERVER_PATH}/${recipe.image_url}`} alt="" />
               </td>
               <td>{recipe.title}</td>
             </tr>

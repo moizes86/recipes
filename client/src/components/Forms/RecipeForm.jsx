@@ -7,9 +7,12 @@ import {
   addRecipe,
   getRecipe,
   editRecipe,
+  uploadImage,
 } from "../../services/API_Services/RecipeAPI";
 
-import { useLocation } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
+
+import { useSelector } from "react-redux";
 
 // Components
 import InputCheckbox from "./InputCheckbox";
@@ -18,22 +21,22 @@ import Ingredients from "./RecipeFormIngredients";
 import Instructions from "./RecipeFormInstructions";
 import ImageUpload from "./ImageUpload";
 
-import { useParams } from "react-router-dom";
-
 import "../../styles/styles.scss";
+import CustomButton from "../CustomButton";
 
 const { validationsAPI } = require("../../DAL/validations");
 
 const RecipeForm = () => {
   const location = useLocation();
   const params = useParams();
+  const { id: user_id } = useSelector((state) => state.activeUser);
 
   const [values, setValues] = useState({
-    user_id: 1,
+    user_id,
     title: "",
     source: "",
     source_url: "",
-    image: null,
+    image_url: null,
     description: "",
     dietsSelected: [],
     categoriesSelected: [],
@@ -69,8 +72,9 @@ const RecipeForm = () => {
       categories: options[2],
     });
   };
+
   const getRecipeAsync = async () => {
-    const {recipeId} = params;
+    const { recipeId } = params;
     let { data } = await getRecipe(recipeId);
 
     data.dietsSelected = data.dietsSelected.map((diet) => diet.id);
@@ -128,11 +132,13 @@ const RecipeForm = () => {
     setValues({ ...values });
   };
 
-  const addImage = (image) => setValues({ ...values, image });
-  const removeImage = () => setValues({ ...values, image: "" });
+  const addImage = (image_url) => {
+    setValues({ ...values, image_url });
+  };
+  const removeImage = () => setValues({ ...values, image_url: "" });
 
   const validateForm = () => {
-    const { user_id, title, source_url, image, description, ingredients, instructions, servings } = values;
+    const { user_id, title, source_url, description, ingredients, instructions, servings } = values;
     try {
       validationsAPI.required("UserId", user_id);
       validationsAPI.recipeTitle(title);
@@ -141,7 +147,6 @@ const RecipeForm = () => {
       validationsAPI.instructions(instructions);
       validationsAPI.servings(servings);
       if (source_url) validationsAPI.url(source_url);
-      if (image) validationsAPI.image(image);
 
       return true;
     } catch (e) {
@@ -149,13 +154,23 @@ const RecipeForm = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    const formData = new FormData();
+
+    for (const value in values) {
+      if (values[value] instanceof (Object) && value !== 'image_url') {
+        formData.append(value, JSON.stringify(values[value]));
+      } else {
+        formData.append(value, values[value]);
+      }
+    }
+
     if (validateForm()) {
       if (location.pathname === "/add-recipe") {
-        addRecipe({ ...values });
+        await addRecipe(formData);
       } else {
-        editRecipe({ ...values });
+        editRecipe(formData);
       }
     }
   };
@@ -178,7 +193,12 @@ const RecipeForm = () => {
             </h2>
           </div>
 
-          <div id="collapseOne" className="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+          <div
+            id="collapseOne"
+            className="collapse show"
+            aria-labelledby="headingOne"
+            data-parent="#accordionExample"
+          >
             <div className="card-body">
               <div className="form-row">
                 <InputField
@@ -254,7 +274,12 @@ const RecipeForm = () => {
               </button>
             </h2>
           </div>
-          <div id="collapseTwo" className="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+          <div
+            id="collapseTwo"
+            className="collapse"
+            aria-labelledby="headingTwo"
+            data-parent="#accordionExample"
+          >
             <div className="card-body">
               <InputCheckbox
                 title="Diets:"
@@ -317,7 +342,12 @@ const RecipeForm = () => {
               </button>
             </h2>
           </div>
-          <div id="collapseThree" className="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
+          <div
+            id="collapseThree"
+            className="collapse"
+            aria-labelledby="headingThree"
+            data-parent="#accordionExample"
+          >
             <div className="card-body">
               <Ingredients
                 measuringUnits={options.measuringUnits}
@@ -345,7 +375,12 @@ const RecipeForm = () => {
               </button>
             </h2>
           </div>
-          <div id="collapseFour" className="collapse" aria-labelledby="headingFour" data-parent="#accordionExample">
+          <div
+            id="collapseFour"
+            className="collapse"
+            aria-labelledby="headingFour"
+            data-parent="#accordionExample"
+          >
             <div className="card-body">
               <Instructions instructions={values.instructions} addItem={addItem} removeItem={removeItem} />
             </div>
@@ -367,17 +402,23 @@ const RecipeForm = () => {
               </button>
             </h2>
           </div>
-          <div id="collapseFive" className="collapse" aria-labelledby="headingFive" data-parent="#accordionExample">
+          <div
+            id="collapseFive"
+            className="collapse"
+            aria-labelledby="headingFive"
+            data-parent="#accordionExample"
+          >
             <div className="card-body">
-              <ImageUpload addImage={addImage} removeImage={removeImage} image={values.image} />
+              <ImageUpload addImage={addImage} removeImage={removeImage} image_url={values.image_url} />
             </div>
           </div>
         </div>
       </div>
 
-      <button className="btn btn-primary mt-3" type="submit">
+        <CustomButton type="submit">
         {location.pathname === "/add-recipe" ? "Add" : "Edit"} Recipe
-      </button>
+
+        </CustomButton>
       <br />
       {errors.general && <small>{errors.general}</small>}
     </form>

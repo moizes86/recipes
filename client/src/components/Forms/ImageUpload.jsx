@@ -1,51 +1,61 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
-const ImageUpload = ({ image, addImage, removeImage }) => {
+const ImageUpload = ({ image_url, addImage, removeImage }) => {
+  const [imageFile, setImageFile] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const [removeImageBtn, setRemoveImageBtn] = useState(false);
   const [error, setError] = useState("");
 
-  const validateImage = ({ target: { name, value } }) => {};
+  const fileInputRef = useRef();
 
-  const uploadImageFile = ({ target: { files } }) => {
-    if (files[0]?.size / 1024 > 4000) {
-      setError("Maximum size 4MB");
-    } else if (!/image\/.*/.test(files[0].type)) {
-      setError("Invalid file type: Images only");
+  useEffect(() => {
+    if (imageFile) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result);
+      };
+      reader.readAsDataURL(imageFile);
     } else {
-      addImage(URL.createObjectURL(files[0]));
-      if (error) setError("");
+      setPreview(null);
     }
-  };
+  }, [imageFile]);
 
-  const uploadImageUrl = (e) => {
-    e.preventDefault();
-    if (!image) {
-      addImage(document.querySelector("#image-url").value);
+  const handleChange = ({ target: { files } }) => {
+    fileInputRef.current.click();
+    const file = files[0];
+    if (file && file.type.substr(0, 5) === "image") {
+      setImageFile(file);
+      addImage(file);
+      setError("");
+      setRemoveImageBtn(true);
     } else {
-      setError("An image is already set");
+      setImageFile(null);
+      setError("Invalid image");
     }
   };
 
   return (
     <div className="image-upload mb-5">
-      <div className="">
-        <label className="sr-only" for="image-url">
-          Image url
+      <div className="custom-file mb-4">
+        <input
+          type="file"
+          className="custom-file-input"
+          id="customFile"
+          onChange={handleChange}
+          ref={fileInputRef}
+          accept="image/*"
+        />
+        <label htmlFor="customFile" className="custom-file-label">
+          {imageFile?.name ?? image_url ?? "Select File"}
         </label>
-        <div className="input-group mb-2">
-          <div className="input-group-prepend">
-            <div className="input-group-text">@</div>
-          </div>
-          <input type="text" className="form-control" id="image-url" placeholder="Enter image url" />
-          <button onClick={uploadImageUrl}>Upload</button>
-        </div>
-        {image?.type === "url" && (
-          <>
-            <small>{image.content}</small>
-            <p onClick={() => removeImage()}>X remove</p>
-          </>
-        )}
       </div>
-      {error && <small>{error}</small>}
+      <br />
+      <small>{error}</small>
+
+      <div className="d-flex justify-content-between">
+        <img src={preview ?? `${process.env.REACT_APP_SERVER_PATH}/${image_url}`} alt="" />
+        {removeImageBtn && <i class="far fa-trash-alt" id="11" title="instructions" index="0"></i>}
+      </div>
     </div>
   );
 };

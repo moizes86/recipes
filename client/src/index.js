@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import reportWebVitals from "./reportWebVitals";
-import { BrowserRouter, Switch, Route } from "react-router-dom";
+// import { BrowserRouter, Switch, Route } from "react-router-dom";
 
 // Redux
 import { Provider } from "react-redux";
@@ -9,13 +9,13 @@ import store from "./redux/store";
 
 // Components
 import App from "./App";
-import Navbar from "./components/Navbar";
-import RecipePage from "./components/RecipePage";
-import RecipeForm from "./components/Forms/RecipeForm";
-import MyProfile from "./components/MyProfile";
-import Signup from "./components/Signup";
-import Login from "./components/Login";
-import MyRecipes from './components/MyRecipes';
+// import Navbar from "./components/Navbar";
+// import RecipePage from "./components/RecipePage";
+// import RecipeForm from "./components/Forms/RecipeForm";
+// import MyProfile from "./components/MyProfile";
+// import Signup from "./components/Signup";
+// import Login from "./components/Login";
+// import MyRecipes from './components/MyRecipes';
 
 // Styles
 import "bootstrap/dist/css/bootstrap.css";
@@ -26,7 +26,9 @@ import "./styles/styles.scss";
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
-      <BrowserRouter>
+      <App />
+     
+      {/* <BrowserRouter>
         <Navbar />
         <div className="container-md">
           <Switch>
@@ -39,7 +41,7 @@ ReactDOM.render(
             <Route exact path="/my-recipes" component={MyRecipes} />
           </Switch>
         </div>
-      </BrowserRouter>
+      </BrowserRouter> */}
     </Provider>
   </React.StrictMode>,
   document.getElementById("root")

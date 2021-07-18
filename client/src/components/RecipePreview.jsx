@@ -9,7 +9,7 @@ const RecipePreview = ({ data: { id, title, image_url, description } }) => {
     <div className="recipe-preview">
       <div className="thumb-box">
         <span className="link" onClick={() => history.push(`/recipes/${id}`)}>
-          <img src={image_url} alt="" />
+          <img src={`${process.env.REACT_APP_SERVER_PATH}/${image_url}`} alt="" />
           <span className="overlay-box">
             <span className="title">{title}</span>
             <span className="description">{description}</span>

@@ -7,12 +7,9 @@ import {
   addRecipe,
   getRecipe,
   editRecipe,
-  uploadImage,
 } from "../../services/API_Services/RecipeAPI";
 
 import { useParams, useLocation } from "react-router-dom";
-
-import { useSelector } from "react-redux";
 
 // Components
 import InputCheckbox from "./InputCheckbox";
@@ -26,13 +23,26 @@ import CustomButton from "../CustomButton";
 
 const { validationsAPI } = require("../../DAL/validations");
 
+const initialValues = {
+  title: "",
+  source: "",
+  source_url: "",
+  image_url: null,
+  description: "",
+  dietsSelected: [],
+  categoriesSelected: [],
+  ingredients: [],
+  instructions: [],
+  cook: 0,
+  servings: 0,
+};
+
 const RecipeForm = () => {
   const location = useLocation();
   const params = useParams();
-  const { id: user_id } = useSelector((state) => state.activeUser);
 
+  // STATES
   const [values, setValues] = useState({
-    user_id,
     title: "",
     source: "",
     source_url: "",
@@ -42,8 +52,8 @@ const RecipeForm = () => {
     categoriesSelected: [],
     ingredients: [],
     instructions: [],
-    cook: "",
-    servings: "",
+    cook: 0,
+    servings: 0,
   });
 
   const [errors, setErrors] = useState({
@@ -61,6 +71,7 @@ const RecipeForm = () => {
     categories: [],
   });
 
+  // INITIAL SETTINGS
   const getOptionsAsync = async () => {
     const options = await Promise.all(
       [await getMeasuringUnits(), await getDiets(), await getCategories()].map((option) => option.data)
@@ -74,6 +85,7 @@ const RecipeForm = () => {
   };
 
   const getRecipeAsync = async () => {
+    // Sets values to data from server
     const { recipeId } = params;
     let { data } = await getRecipe(recipeId);
 
@@ -86,13 +98,16 @@ const RecipeForm = () => {
 
     setValues(data);
   };
-  useEffect(() => {
-    getOptionsAsync();
 
+  useEffect(() => {
+    setValues({ ...initialValues });
+    getOptionsAsync();
     if (location.pathname.includes("/edit-recipe")) {
       getRecipeAsync();
     }
   }, [location]);
+
+  // FUNCTIONALITY
 
   const handleChange = ({ target: { name, value } }) => {
     setValues({ ...values, [name]: value });
@@ -135,45 +150,63 @@ const RecipeForm = () => {
   const addImage = (image_url) => {
     setValues({ ...values, image_url });
   };
-  const removeImage = () => setValues({ ...values, image_url: "" });
+
+  const removeImage = () => setValues({ ...values, image_url: null });
+
+  // SUBMITTING
 
   const validateForm = () => {
-    const { user_id, title, source_url, description, ingredients, instructions, servings } = values;
+    const { title, cook, source_url, description, ingredients, instructions, servings, image_url } = values;
     try {
-      validationsAPI.required("UserId", user_id);
       validationsAPI.recipeTitle(title);
-      validationsAPI.required("Description", description);
+      validationsAPI.description(description);
+      validationsAPI.cook(cook);
+      validationsAPI.servings(servings);
       validationsAPI.ingredients(ingredients);
       validationsAPI.instructions(instructions);
-      validationsAPI.servings(servings);
+      validationsAPI.image(image_url);
       if (source_url) validationsAPI.url(source_url);
 
       return true;
     } catch (e) {
-      setErrors({ ...errors, general: e.message });
+      setErrors({ [e.field]: e.message });
+
+      // Toggle class  'show' where error has occured to enable scrolling
+      let targetEl = document.querySelector(`.accordion #${e.field}`);
+      while (!Array.from(targetEl.classList).includes("collapse")) {
+        targetEl = targetEl.parentElement;
+      }
+      if (!Array.from(targetEl.classList).includes("show")) targetEl.classList.toggle("show");
+      document.querySelector(`#${e.field}`).scrollIntoView({ behavior: "smooth", block: "center" }); // scroll to element
+
+      return false;
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
+    try {
+      if (validateForm()) {
+        const formData = new FormData();
+        for (const value in values) {
+          if (values[value] instanceof Object && value !== "image_url") {
+            formData.append(value, JSON.stringify(values[value]));
+          } else {
+            formData.append(value, values[value]);
+          }
+        }
 
-    for (const value in values) {
-      if (values[value] instanceof (Object) && value !== 'image_url') {
-        formData.append(value, JSON.stringify(values[value]));
-      } else {
-        formData.append(value, values[value]);
+        if (location.pathname === "/add-recipe") {
+          await addRecipe(formData);
+        } else {
+          await editRecipe(formData);
+        }
       }
-    }
-
-    if (validateForm()) {
-      if (location.pathname === "/add-recipe") {
-        await addRecipe(formData);
-      } else {
-        editRecipe(formData);
-      }
+    } catch (e) {
+      setErrors({ ...errors, genereal: e.message });
     }
   };
+
   return (
     <form className="recipe-form " onSubmit={handleSubmit}>
       <div className="accordion" id="accordionExample">
@@ -193,12 +226,7 @@ const RecipeForm = () => {
             </h2>
           </div>
 
-          <div
-            id="collapseOne"
-            className="collapse show"
-            aria-labelledby="headingOne"
-            data-parent="#accordionExample"
-          >
+          <div id="collapseOne" className="collapse show" aria-labelledby="headingOne">
             <div className="card-body">
               <div className="form-row">
                 <InputField
@@ -254,13 +282,14 @@ const RecipeForm = () => {
                   // required
                   onChange={handleChange}
                 ></textarea>
+                <small>{errors.description}</small>
               </div>
             </div>
           </div>
         </div>
 
         <div className="card">
-          <div className="card-header" id="headingTwo">
+          <div className="card-header " id="headingTwo">
             <h2 className="mb-0">
               <button
                 className="btn btn-link btn-block text-left collapsed"
@@ -274,12 +303,7 @@ const RecipeForm = () => {
               </button>
             </h2>
           </div>
-          <div
-            id="collapseTwo"
-            className="collapse"
-            aria-labelledby="headingTwo"
-            data-parent="#accordionExample"
-          >
+          <div id="collapseTwo" className="collapse" aria-labelledby="headingTwo">
             <div className="card-body">
               <InputCheckbox
                 title="Diets:"
@@ -298,28 +322,31 @@ const RecipeForm = () => {
                 handleCheck={handleCheck}
               />
 
-              <div className="form-row mt-3">
+              <div className="form-row  mt-3">
                 <InputField
                   label="Cook"
                   name="cook"
                   type="number"
                   value={values.cook}
+                  errors={errors.cook}
                   required={false}
                   shrinkLabel={false}
                   classes="font-bolder"
-                  cols="col col-sm-2"
+                  cols="col col-md-3 mr-4"
                   handleChange={handleChange}
                 />
+
                 <InputField
                   label="Servings"
                   name="servings"
                   type="number"
                   value={values.servings}
+                  errors={errors.servings}
                   max={10}
                   required={false}
                   shrinkLabel={false}
                   classes="font-bolder"
-                  cols="col-sm-2 col"
+                  cols="col col-md-3"
                   handleChange={handleChange}
                 />
               </div>
@@ -334,20 +361,15 @@ const RecipeForm = () => {
                 className="btn btn-link btn-block text-left collapsed"
                 type="button"
                 data-toggle="collapse"
-                data-target="#collapseThree"
-                aria-expanded="false"
-                aria-controls="collapseThree"
+                data-target="#ingredients"
+                aria-expanded="true"
+                aria-controls="ingredients"
               >
                 Ingredients
               </button>
             </h2>
           </div>
-          <div
-            id="collapseThree"
-            className="collapse"
-            aria-labelledby="headingThree"
-            data-parent="#accordionExample"
-          >
+          <div id="ingredients" className="collapse" aria-labelledby="headingThree">
             <div className="card-body">
               <Ingredients
                 measuringUnits={options.measuringUnits}
@@ -367,22 +389,22 @@ const RecipeForm = () => {
                 className="btn btn-link btn-block text-left collapsed"
                 type="button"
                 data-toggle="collapse"
-                data-target="#collapseFour"
+                data-target="#instructions"
                 aria-expanded="false"
-                aria-controls="collapseFour"
+                aria-controls="instructions"
               >
                 Instructions
               </button>
             </h2>
           </div>
-          <div
-            id="collapseFour"
-            className="collapse"
-            aria-labelledby="headingFour"
-            data-parent="#accordionExample"
-          >
+          <div id="instructions" className="collapse" aria-labelledby="instructions">
             <div className="card-body">
-              <Instructions instructions={values.instructions} addItem={addItem} removeItem={removeItem} />
+              <Instructions
+                instructions={values.instructions}
+                addItem={addItem}
+                removeItem={removeItem}
+                submitError={errors.instructions}
+              />
             </div>
           </div>
         </div>
@@ -402,24 +424,20 @@ const RecipeForm = () => {
               </button>
             </h2>
           </div>
-          <div
-            id="collapseFive"
-            className="collapse"
-            aria-labelledby="headingFive"
-            data-parent="#accordionExample"
-          >
+          <div id="collapseFive" className="collapse" aria-labelledby="headingFive">
             <div className="card-body">
-              <ImageUpload addImage={addImage} removeImage={removeImage} image_url={values.image_url} />
+              <ImageUpload
+                addImage={addImage}
+                removeImage={removeImage}
+                image_url={values.image_url}
+                errors={errors.image_url}
+              />
             </div>
           </div>
         </div>
       </div>
 
-        <CustomButton type="submit">
-        {location.pathname === "/add-recipe" ? "Add" : "Edit"} Recipe
-
-        </CustomButton>
-      <br />
+      <CustomButton type="submit">{location.pathname === "/add-recipe" ? "Add" : "Edit"} Recipe</CustomButton>
       {errors.general && <small>{errors.general}</small>}
     </form>
   );

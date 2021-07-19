@@ -17,7 +17,7 @@ const InputField = ({
 }) => {
   const [inputFocused, setInputFocused] = useState(false);
   return (
-    <div className={`input-field ${cols}`}>
+    <div className={`input-field ${cols}`} id={name}>
       <div controlid={name} className={`form-group flex-grow-1  ${shrinkLabel ? "parent-for-input-shrink" : ""}`}>
         <label className={`form-label ${shrinkLabel ? (inputFocused || value?.length) && "shrink" : classes}`}>
           {label}

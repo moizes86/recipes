@@ -51,7 +51,13 @@ const Search = () => {
           }
         />
         <div className="icon">
-          <i className="fa fa-search" />
+          <i
+            className="fa fa-search"
+            onClick={(e) => {
+              handleSubmit(e);
+              document.querySelector(".gallery").scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+          />
         </div>
       </div>
 

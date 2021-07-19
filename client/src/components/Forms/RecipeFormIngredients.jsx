@@ -15,6 +15,7 @@ const RecipeFormIngredients = ({ measuringUnits, ingredients, addItem, removeIte
 
   const handleIngredient = (e) => {
     e.preventDefault();
+    
     const { amount, unitId, text } = values;
     if (amount && text) {
       addItem({ amount, unitId, text, unit: measuringUnits[values.unitId - 1]?.unit }, "ingredients");
@@ -84,7 +85,7 @@ const RecipeFormIngredients = ({ measuringUnits, ingredients, addItem, removeIte
 
       <RecipeIngredients ingredients={ingredients} removeItem={removeItem} partOfForm={true}/>
 
-      <small>{error || submitError}</small>
+      <small>{error || (!ingredients.length && submitError)}</small>
     </div>
   );
 };

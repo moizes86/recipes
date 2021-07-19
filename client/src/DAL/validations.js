@@ -42,7 +42,9 @@ const validationsAPI = {
 
   confirmPassword(confirmPassword, password = "") {
     validationsAPI.required("confirmPassword", confirmPassword);
+
     const reg = /^(?=.*[0-9])(?=.*[a-zA-Z]).{6,}$/;
+
     if (confirmPassword.length < 6)
       throw new CustomError("confirmPassword", "Password length must be at least six chars");
     if (!reg.test(confirmPassword))
@@ -51,8 +53,12 @@ const validationsAPI = {
   },
 
   recipeTitle(title) {
-    if (title.length < 6) throw Error("Title must be at least six chars");
-    if (title.length > 45) throw Error("Title is too long! Maximum 45 chars");
+    if (title.length < 4) throw new CustomError("title", "Title must be at least four chars");
+    if (title.length > 45) throw new CustomError("title", "Title is too long! Maximum 45 chars");
+  },
+
+  description(desc) {
+    validationsAPI.required("description", desc);
   },
 
   url(url) {
@@ -62,29 +68,30 @@ const validationsAPI = {
   },
 
   servings(n) {
-    if (n < 1 || n > 10) throw Error("Servings must be between 1-10");
+    if (n < 1 || n > 10) throw new CustomError("servings", "Servings must be between 1-10");
   },
 
   cook(n) {
-    if (n < 1) throw Error("Invalid cooking time");
+    validationsAPI.required("cook", n);
+    if (n < 1) throw new CustomError("cook", "Invalid cooking time");
   },
 
   image(image) {
-    const reg = /(http(s?):\/\/)(.)*\.(?:jpe?g|gif|png)/;
-    if (!reg.test(image)) throw Error("Invalid image url");
+    if (image.type.substr(0, 5) !== "image") throw new CustomError("image_url", "Invalid file- images only");
+    if (image.size > 1024 * 1024 * 5) throw new CustomError("image_url", "Maximum size 5 mb");
   },
 
   ingredients(ingredients) {
-    if (!ingredients.length) throw Error("Ingredients are required");
+    if (!ingredients.length) throw new CustomError("ingredients", "Ingredients are required");
     ingredients.forEach((ingredient) => {
-      if (!ingredient.text || !ingredient.unitId) throw Error("Invalid ingredient");
+      if (!ingredient.text || !ingredient.unitId) throw new CustomError("ingredients", "Invalid ingredient");
     });
   },
 
   instructions(instructions) {
-    if (!instructions.length) throw Error("Instructions are required");
+    if (!instructions.length) throw new CustomError("instructions", "Instructions are required");
     instructions.forEach((instruction) => {
-      if (!instruction) throw Error("Invalid instruction");
+      if (!instruction) throw new CustomError("instructions", "Invalid instruction");
     });
   },
 };

@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 
 import InputField from "./InputField";
-// import RecipeFormItems from "./RecipeFormItems";
 import RecipeInstructions from "../RecipeInstructions";
 import "../../styles/styles.scss";
 
-const RecipeFormInstructions = ({ instructions, addItem, removeItem }) => {
+const RecipeFormInstructions = ({ instructions, addItem, removeItem, submitError }) => {
   const [instruction, setInstruction] = useState({
     id: null,
     text: "",
@@ -47,7 +46,7 @@ const RecipeFormInstructions = ({ instructions, addItem, removeItem }) => {
 
       <RecipeInstructions instructions={instructions} removeItem={removeItem} partOfForm={true}/>
 
-      <small>{error}</small>
+      <small>{error || (!instructions.length && submitError)}</small>
     </div>
   );
 };

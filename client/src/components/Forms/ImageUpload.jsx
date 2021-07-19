@@ -1,9 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 
-const ImageUpload = ({ image_url, addImage, removeImage }) => {
+const ImageUpload = ({ image_url, addImage, removeImage, errors }) => {
   const [imageFile, setImageFile] = useState(null);
   const [preview, setPreview] = useState(null);
-  const [removeImageBtn, setRemoveImageBtn] = useState(false);
   const [error, setError] = useState("");
 
   const fileInputRef = useRef();
@@ -27,7 +26,6 @@ const ImageUpload = ({ image_url, addImage, removeImage }) => {
       setImageFile(file);
       addImage(file);
       setError("");
-      setRemoveImageBtn(true);
     } else {
       setImageFile(null);
       setError("Invalid image");
@@ -54,8 +52,20 @@ const ImageUpload = ({ image_url, addImage, removeImage }) => {
 
       <div className="d-flex justify-content-between">
         <img src={preview ?? `${process.env.REACT_APP_SERVER_PATH}/${image_url}`} alt="" />
-        {removeImageBtn && <i class="far fa-trash-alt" id="11" title="instructions" index="0"></i>}
+        {imageFile && (
+          <i
+            className="far fa-trash-alt"
+            id="11"
+            title="instructions"
+            index="0"
+            onClick={() => {
+              removeImage();
+              setImageFile(null);
+            }}
+          ></i>
+        )}
       </div>
+      <small>{errors}</small>
     </div>
   );
 };

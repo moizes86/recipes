@@ -4,6 +4,11 @@ const validationsAPI = {
   required(name, value) {
     if (!value) throw Error(`${name} is required`);
   },
+
+  user(cookie){
+    console.log(cookie)
+  },
+  
   email(email) {
     this.required("Email", email);
     const reg = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;

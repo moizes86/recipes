@@ -13,6 +13,7 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname));
   },
+
 });
 
 const imageFilter = (req, file, cb) => {
@@ -86,22 +87,28 @@ router.get("/categories", async (req, res) => {
   }
 });
 
-router.post("/add-recipe", async (req, res) => {
+router.post("/add-recipe", upload.single("image_url"), async (req, res) => {
   try {
     let {
-      user_id,
       title,
       description,
       source,
       source_url,
       servings,
       cook,
-      // image,
       dietsSelected,
       categoriesSelected,
       ingredients,
       instructions,
     } = req.body;
+
+    const user_id = req.cookies.user[0].id;
+    let image = req.file?.path;
+
+    ingredients = JSON.parse(ingredients);
+    instructions = JSON.parse(instructions);
+    dietsSelected = JSON.parse(dietsSelected);
+    categoriesSelected = JSON.parse(categoriesSelected);
 
     // Validate values
     validationsAPI.required("UserId", user_id);
@@ -109,10 +116,10 @@ router.post("/add-recipe", async (req, res) => {
     validationsAPI.recipeTitle(title);
     validationsAPI.ingredients(ingredients);
     validationsAPI.instructions(instructions);
+    validationsAPI.servings(servings);
+    validationsAPI.cook(cook);
     if (source_url) validationsAPI.sourceUrl(source_url);
-    if (servings) validationsAPI.servings(servings);
-    if (cook) validationsAPI.cook(cook);
-    // if (image) validationsAPI.image(image);
+    if (image) validationsAPI.image(image);
     // End validate values
 
     // Add to recipes table
@@ -123,8 +130,8 @@ router.post("/add-recipe", async (req, res) => {
       source,
       source_url,
       servings,
-      cook
-      // image
+      cook,
+      image
     );
 
     const newRecipeId = resultCreateRecipe.insertId;
@@ -167,13 +174,14 @@ router.put("/edit-recipe", upload.single("image_url"), async (req, res) => {
     categoriesSelected = JSON.parse(categoriesSelected);
 
     // Validate values
+    validationsAPI.user(req.cookies.user[0].id);
     validationsAPI.required("Description", description);
     validationsAPI.recipeTitle(title);
     validationsAPI.ingredients(ingredients);
     validationsAPI.instructions(instructions);
+    validationsAPI.cook(cook);
+    validationsAPI.servings(servings);
     if (source_url) validationsAPI.sourceUrl(source_url);
-    if (servings) validationsAPI.servings(servings);
-    if (cook) validationsAPI.cook(cook);
 
     // End validate values
 
@@ -196,8 +204,6 @@ router.put("/edit-recipe", upload.single("image_url"), async (req, res) => {
     await recipesAPI.deleteCategories(recipe_id);
     await recipesAPI.addCategories(recipe_id, categoriesSelected);
 
-    // await recipesAPI.uploadImages(recipe_id, image);
-
     res.status(200).send("OK");
   } catch (e) {
     res.status(500).json({ err: e.message });
@@ -209,25 +215,6 @@ router.get("/my-recipes?:id", async (req, res) => {
   try {
     const [result] = await recipesAPI.getMyRecipes(userId);
     res.status(200).json(result);
-  } catch (e) {
-    res.status(500).json({ err: e.message });
-  }
-});
-
-router.post("/images", upload.single("image"), async (req, res) => {
-  try {
-    const [result] = await recipesAPI.uploadImages(req.file.path);
-    res.status(200).send("Image uploaded");
-  } catch (e) {
-    res.status(500).json({ err: e.message });
-  }
-});
-
-router.get("/images", async (req, res) => {
-  const { recipe_id } = req.query;
-  try {
-    const [result] = await recipesAPI.getImages(recipe_id);
-    res.status(200).send(result);
   } catch (e) {
     res.status(500).json({ err: e.message });
   }

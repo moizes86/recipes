@@ -165,16 +165,16 @@ const recipesAPI = {
     description,
     source = null,
     source_url = null,
-    servings = null,
-    cook = null,
+    servings,
+    cook,
     image = null
   ) {
     try {
       return ([result] = await promisePool.execute(
         "INSERT INTO recipesapp.recipes \
-        (user_id, title, description, source, source_url, servings, cook)\
-         VALUES (?, ?, ?, ?, ?, ?, ?);",
-        [user_id, title, description, source, source_url, servings, cook]
+        (user_id, title, description, source, source_url, servings, cook, image_url)\
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
+        [user_id, title, description, source, source_url, servings, cook, image]
       ));
     } catch (e) {
       return e;
@@ -311,27 +311,6 @@ const recipesAPI = {
   async getMyRecipes(id) {
     try {
       return ([result] = await promisePool.execute("SELECT * FROM recipesapp.recipes WHERE user_id=?", [id]));
-    } catch (e) {
-      return e;
-    }
-  },
-
-  async uploadImages(recipe_id,path) {
-    try {
-      return ([result] = await promisePool.execute(
-        "INSERT INTO recipesapp.images (recipe_id, url) VALUES (?,?)",
-        [recipe_id, path]
-      ));
-    } catch (e) {
-      return e;
-    }
-  },
-
-  async getImages(recipe_id) {
-    try {
-      return ([result] = await promisePool.execute("SELECT * FROM recipesapp.images WHERE recipe_id = ?", [
-        recipe_id,
-      ]));
     } catch (e) {
       return e;
     }

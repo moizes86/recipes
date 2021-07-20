@@ -10,6 +10,7 @@ import {
 } from "../../services/API_Services/RecipeAPI";
 
 import { useParams, useLocation } from "react-router-dom";
+import useFetch from "../../useFetch";
 
 // Components
 import InputCheckbox from "./InputCheckbox";
@@ -17,6 +18,7 @@ import InputField from "./InputField";
 import Ingredients from "./RecipeFormIngredients";
 import Instructions from "./RecipeFormInstructions";
 import ImageUpload from "./ImageUpload";
+import CheckCircleSuccess from "../CheckCircleSuccess";
 
 import "../../styles/styles.scss";
 import CustomButton from "../CustomButton";
@@ -40,6 +42,7 @@ const initialValues = {
 const RecipeForm = () => {
   const location = useLocation();
   const params = useParams();
+  const { sendRequest, loading, data, error, Spinner } = useFetch();
 
   // STATES
   const [values, setValues] = useState({
@@ -100,10 +103,11 @@ const RecipeForm = () => {
   };
 
   useEffect(() => {
-    setValues({ ...initialValues });
     getOptionsAsync();
     if (location.pathname.includes("/edit-recipe")) {
       getRecipeAsync();
+    } else {
+      setValues({ ...initialValues });
     }
   }, [location]);
 
@@ -166,7 +170,6 @@ const RecipeForm = () => {
       validationsAPI.instructions(instructions);
       validationsAPI.image(image_url);
       if (source_url) validationsAPI.url(source_url);
-
       return true;
     } catch (e) {
       setErrors({ [e.field]: e.message });
@@ -197,9 +200,9 @@ const RecipeForm = () => {
         }
 
         if (location.pathname === "/add-recipe") {
-          await addRecipe(formData);
+          await sendRequest(addRecipe, formData);
         } else {
-          await editRecipe(formData);
+          await sendRequest(editRecipe, formData);
         }
       }
     } catch (e) {
@@ -279,7 +282,6 @@ const RecipeForm = () => {
                   name="description"
                   value={values.description}
                   rows="3"
-                  // required
                   onChange={handleChange}
                 ></textarea>
                 <small>{errors.description}</small>
@@ -437,7 +439,15 @@ const RecipeForm = () => {
         </div>
       </div>
 
-      <CustomButton type="submit">{location.pathname === "/add-recipe" ? "Add" : "Edit"} Recipe</CustomButton>
+      {loading ? (
+        <Spinner />
+      ) : data ? (
+        <CheckCircleSuccess message="updated successfully" />
+      ) : (
+        <CustomButton type="submit">
+          {location.pathname === "/add-recipe" ? "Add Recipe" : "Save"}
+        </CustomButton>
+      )}
       {errors.general && <small>{errors.general}</small>}
     </form>
   );

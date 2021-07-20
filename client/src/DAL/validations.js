@@ -1,4 +1,4 @@
-class CustomError extends Error {
+export class CustomError extends Error {
   constructor(field, ...params) {
     // Pass remaining arguments (including vendor specific ones) to parent constructor
     super(...params);
@@ -12,7 +12,7 @@ class CustomError extends Error {
   }
 }
 
-const validationsAPI = {
+export const validationsAPI = {
   required(name, value) {
     if (!value) throw new CustomError(name, `${name} is required`);
   },
@@ -77,7 +77,8 @@ const validationsAPI = {
   },
 
   image(image) {
-    if (image.type.substr(0, 5) !== "image") throw new CustomError("image_url", "Invalid file- images only");
+    if (image.type && image?.type?.substr(0, 5) !== "image")
+      throw new CustomError("image_url", "Invalid file- images only");
     if (image.size > 1024 * 1024 * 5) throw new CustomError("image_url", "Maximum size 5 mb");
   },
 
@@ -94,8 +95,4 @@ const validationsAPI = {
       if (!instruction) throw new CustomError("instructions", "Invalid instruction");
     });
   },
-};
-
-module.exports = {
-  validationsAPI,
 };

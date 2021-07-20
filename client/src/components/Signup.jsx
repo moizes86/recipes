@@ -1,22 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 import { validationsAPI } from "../DAL/validations";
+import useFetch from "../useFetch";
+import { createUser } from "../services/API_Services/UserAPI";
+import { useHistory } from "react-router-dom";
+
 
 import InputField from "./Forms/InputField";
 import CustomButton from "./CustomButton";
-
-import { validateData } from "../DAL/api";
-
-import { createUser } from "../services/API_Services/UserAPI";
-
-// Redux
-import { useDispatch } from "react-redux";
-import { onLoading } from "../redux/actions";
+import CheckCircleSuccess from "./CheckCircleSuccess";
 
 import "../styles/styles.scss";
 
 const Signup = () => {
-  const dispatch = useDispatch();
+  const history = useHistory();
+  const { sendRequest, loading, data, error, Spinner } = useFetch();
 
   const [values, setValues] = useState({
     email: "",
@@ -31,8 +29,6 @@ const Signup = () => {
     password: null,
     confirmPassword: null,
   });
-
-  const [signupError, setSignupError] = useState(null);
 
   const handleBlur = ({ target: { name, value } }) => {
     try {
@@ -52,26 +48,24 @@ const Signup = () => {
     e.preventDefault();
 
     setErrors({});
-    setSignupError("");
-    
+
     try {
       validationsAPI.email(values.email);
       validationsAPI.username(values.username);
       validationsAPI.password(values.password);
       validationsAPI.confirmPassword(values.confirmPassword, values.password);
-
-      const response = await createUser({ values });
-      if (response.status === 200) {
-      } else {
-        if (response.data.errno === 1062) setSignupError("User already exists");
-        else setSignupError("Well, something went wrong");
-      }
+      await sendRequest(createUser, values);
     } catch (e) {
       setErrors({ ...errors, [e.field]: e.message });
     }
-
-    dispatch(onLoading(false));
   };
+
+  useEffect(() => {
+    if(data)
+    setTimeout(() => {
+      history.push("/login");
+    }, 2000);
+  }, [data]);
 
   return (
     <div className="signup">
@@ -117,11 +111,17 @@ const Signup = () => {
           errors={errors.confirmPassword}
         />
 
-        <CustomButton>Submit</CustomButton>
+        {loading ? (
+          <Spinner />
+        ) : data ? (
+          <CheckCircleSuccess message="Registration Successful. Redirecting..." />
+        ) : (
+          <CustomButton>Submit</CustomButton>
+        )}
 
         <br />
 
-        {signupError && <small>{signupError}</small>}
+        {error && <small>{error}</small>}
       </form>
     </div>
   );

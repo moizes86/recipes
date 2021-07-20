@@ -21,7 +21,7 @@ function App() {
   const dispatch = useDispatch();
   const checkUserLoggedInAsync = async () => {
     const result = await checkUserLoggedIn();
-    dispatch(onLogin(result.data));
+    dispatch(onLogin(result.data[0]));
   };
 
   useEffect(() => checkUserLoggedInAsync());

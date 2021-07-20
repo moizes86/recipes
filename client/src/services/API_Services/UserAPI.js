@@ -1,5 +1,5 @@
 import { httpGet, httpPost, httpPut } from "../CRUD_Service";
-
+import { CustomError } from "../../DAL/validations";
 
 const url = "http://localhost:3100/users";
 
@@ -23,7 +23,14 @@ export const getUserById = async (id) => {
 };
 
 export const loginUser = async (loginData) => {
-  return await httpPost(`${url}/login`, loginData);
+  // try {
+    return await httpPost(`${url}/login`, loginData);
+  // } catch (e) {
+    // debugger
+    // if (e.request.status === 401) {
+      // throw new CustomError('sign');
+    // }
+  // }
 };
 
 export const logoutUser = async () => {

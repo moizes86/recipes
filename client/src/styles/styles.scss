@@ -35,12 +35,9 @@ $letter-spacing-soft: 1px;
   letter-spacing: $letter-spacing-soft;
 }
 
-
-input[type=number]::-webkit-inner-spin-button, 
-input[type=number]::-webkit-outer-spin-button {  
-
-   opacity: 1;
-
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  opacity: 1;
 }
 
 // Custom Classes
@@ -79,6 +76,8 @@ input[type=number]::-webkit-outer-spin-button {
 
 small {
   color: red;
+  text-align: center;
+  margin: auto;
 }
 
 i:hover {
@@ -306,8 +305,7 @@ i:hover {
     padding: 40px;
   }
   .recipe-details {
-
-    a{
+    a {
       color: $pinkish4;
     }
 
@@ -462,11 +460,11 @@ i:hover {
 
       @media #{$break_sm} {
         height: 180px;
-        width:250px;
+        width: 250px;
       }
       @media #{$break_xs} {
         height: 180px;
-        width:100%;
+        width: 100%;
       }
     }
 
@@ -602,6 +600,7 @@ i:hover {
   position: absolute;
   padding-top: 20px;
   max-height: 300px;
+  overflow-y: scroll;
   width: 100%;
   background-color: white;
   box-shadow: 0px 15px 15px rgb(0, 0, 0 / 50%);
@@ -637,10 +636,9 @@ i:hover {
 
 .my-recipes {
   table {
-
     tr:hover {
-        @include my-hover;
-      }
+      @include my-hover;
+    }
 
     td {
       vertical-align: middle;
@@ -650,8 +648,6 @@ i:hover {
         max-height: 100%;
         width: 100px;
       }
-
-      
     }
   }
 }
@@ -666,5 +662,15 @@ i:hover {
 
   i {
     font-size: 2rem;
+  }
+}
+
+.check-circle-success {
+  text-align: center;
+
+  i {
+    color: #198754;
+    font-size: 30px;
+    margin-bottom: 10px;
   }
 }

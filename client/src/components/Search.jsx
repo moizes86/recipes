@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { onSetRecipes } from "../redux/actions";
-import { searchRecipe } from "../services/API_Services/RecipeAPI";
+import { getRecipes, searchRecipe } from "../services/API_Services/RecipeAPI";
 import { useDispatch } from "react-redux";
 
 import SearchAutoComplete from "./SearchAutoComplete";
+import useFetch from "../useFetch";
 
 const Search = () => {
   const dispatch = useDispatch();
@@ -15,11 +16,16 @@ const Search = () => {
     setQuery(value);
   };
 
+  const { sendRequest, loading, data, error, Spinner } = useFetch();
+
   useEffect(() => {
     const delayedSearch = setTimeout(async () => {
       if (query.length) {
         const searchResult = await searchRecipe(query);
         setResults(searchResult.data);
+      } else if (!query) {
+        await sendRequest(getRecipes);
+        setResults(data);
       } else {
         setResults([]);
       }
@@ -30,9 +36,10 @@ const Search = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const result = await searchRecipe(query);
-    dispatch(onSetRecipes(result.data));
+
+    if (results) dispatch(onSetRecipes(results));
   };
+
   return (
     <form className="search-recipe" onSubmit={handleSubmit}>
       <div className="search-bar">

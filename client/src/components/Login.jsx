@@ -1,25 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 // Redux
 import { onLogin } from "../redux/actions";
 import { useDispatch } from "react-redux";
-
-import Cookies from 'js-cookie'
+import { validationsAPI } from "../DAL/validations";
+import { loginUser } from "../services/API_Services/UserAPI";
+import useFetch from "../useFetch";
 
 // Routing
 import { useHistory } from "react-router-dom";
 
 // Components
 import InputField from "./Forms/InputField";
+import CheckCircleSuccess from "./CheckCircleSuccess";
 import CustomButton from "./CustomButton";
-import { loginUser } from "../services/API_Services/UserAPI";
 
 import "../styles/styles.scss";
-import { validationsAPI } from "../DAL/validations";
 
 const Login = () => {
   const dispatch = useDispatch();
   const history = useHistory();
+  const { sendRequest, loading, data, error, Spinner } = useFetch();
 
   const [values, setValues] = useState({
     email: "",
@@ -30,8 +31,6 @@ const Login = () => {
     email: null,
     password: null,
   });
-
-  const [loginError, setLoginError] = useState(null);
 
   const handleBlur = ({ target: { name, value } }) => {
     try {
@@ -50,23 +49,27 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors({});
-    setLoginError("");
+
     try {
       validationsAPI.email(values.email);
       validationsAPI.password(values.password);
-      const result = await loginUser(values);
-      
-      if (!result.data.length) {
-        setLoginError("Invalid user or password");
-      } else {
-        if (loginError) setLoginError("");
-        dispatch(onLogin(...result.data));
-        history.push("/");
-      }
     } catch (e) {
       setErrors({ ...errors, [e.field]: e.message });
+      return;
     }
+
+      await sendRequest(loginUser, values);
   };
+
+  useEffect(() => {
+    if (data?.length) {
+      dispatch(onLogin(data[0]));
+      setTimeout(() => {
+        history.push("/");
+      }, 2000);
+    }
+    console.log(error);
+  }, [data]);
 
   return (
     <div className="login">
@@ -91,11 +94,17 @@ const Login = () => {
           errors={errors.password}
         />
 
-        <CustomButton>Login</CustomButton>
+        {loading ? (
+          <Spinner />
+        ) : data ? (
+          <CheckCircleSuccess message="Registration Successful. Redirecting..." />
+        ) : (
+          <CustomButton>Login</CustomButton>
+        )}
 
         <br />
 
-        {loginError && <small>{loginError}</small>}
+        {error && <small>{error}</small>}
       </form>
     </div>
   );

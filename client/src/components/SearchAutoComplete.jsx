@@ -4,9 +4,9 @@ import { useHistory } from "react-router-dom";
 const SearchAutoComplete = ({ results, inputIsFocused }) => {
   const history = useHistory();
   return (
-    <div className={`search-auto-complete $ ${!inputIsFocused && "display-none"} ${!results.length && "transparent"}`}>
+    <div className={`search-auto-complete $ ${!inputIsFocused && "display-none"} ${!results?.length && "transparent"}`}>
       <ul>
-        {results.map((result) => (
+        {results && results.map((result) => (
           <li
             key={`${result.title}-${result.id}`}
             id={result.id}

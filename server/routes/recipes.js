@@ -119,7 +119,7 @@ router.post("/add-recipe", upload.single("image_url"), async (req, res) => {
     validationsAPI.servings(servings);
     validationsAPI.cook(cook);
     if (source_url) validationsAPI.sourceUrl(source_url);
-    if (image) validationsAPI.image(image);
+    // if (image) validationsAPI.image(image);
     // End validate values
 
     // Add to recipes table

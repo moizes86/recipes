@@ -17,7 +17,8 @@ const usersAPI = {
         [email, username, password]
       );
     } catch (e) {
-      return [e];
+      if (e.errno === 1062) throw Error ("User already exists. Try different email address.");
+      return e;
     }
   },
 

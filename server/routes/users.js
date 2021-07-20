@@ -13,22 +13,16 @@ router.get("/", function (req, res, next) {
 /* POST user signup */
 router.post("/signup", async (req, res) => {
   try {
-    const {
-      values: { email, username, password, confirmPassword },
-    } = req.body;
+    const { email, username, password, confirmPassword } = req.body;
     validationsAPI.email(email);
     validationsAPI.username(username);
     validationsAPI.password(password);
     validationsAPI.confirmPassword(confirmPassword, password);
 
     const [result] = await usersAPI.signup(email, username, password);
-    if (!result.insertId) {
-      res.status(500).json(result);
-    } else {
-      res.status(200).json(result);
-    }
+    res.status(200).json(result);
   } catch (e) {
-    res.status(500).json({ err: e.message });
+    res.status(400).json({ err: e.message });
   }
 });
 
@@ -41,20 +35,20 @@ router.post("/login", async (req, res) => {
     validationsAPI.password(password);
 
     const [user] = await usersAPI.login(email, password);
-    res.cookie("user", user);
-    res.status(200).json(user);
-  } catch (e) {
-    if (e instanceof LoginValidationError) {
-      res.status(400).json({ err: "Invalid email or password" });
-      return;
+    if (!user.length) {
+      throw Error("Email or password incorrect");
+    } else {
+      res.cookie("user", user);
+      res.status(200).json(user);
     }
-    res.status(500).json({ err: e.message });
+  } catch (e) {
+    res.status(200).json({ status: 401, err: e.message, data: undefined });
   }
 });
 
 router.get("/login", async (req, res) => {
   if (req.cookies.user) {
-    res.status(200).send(req.cookies.user[0]);
+    res.status(200).send(req.cookies.user);
   } else res.status(400).send("Not signed in");
 });
 

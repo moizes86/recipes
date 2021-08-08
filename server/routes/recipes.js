@@ -13,7 +13,6 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname));
   },
-
 });
 
 const imageFilter = (req, file, cb) => {
@@ -116,10 +115,7 @@ router.post("/add-recipe", upload.single("image_url"), async (req, res) => {
     validationsAPI.recipeTitle(title);
     validationsAPI.ingredients(ingredients);
     validationsAPI.instructions(instructions);
-    validationsAPI.servings(servings);
-    validationsAPI.cook(cook);
     if (source_url) validationsAPI.sourceUrl(source_url);
-    // if (image) validationsAPI.image(image);
     // End validate values
 
     // Add to recipes table
@@ -179,8 +175,6 @@ router.put("/edit-recipe", upload.single("image_url"), async (req, res) => {
     validationsAPI.recipeTitle(title);
     validationsAPI.ingredients(ingredients);
     validationsAPI.instructions(instructions);
-    validationsAPI.cook(cook);
-    validationsAPI.servings(servings);
     if (source_url) validationsAPI.sourceUrl(source_url);
 
     // End validate values

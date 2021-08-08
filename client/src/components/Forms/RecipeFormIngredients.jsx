@@ -7,7 +7,7 @@ import RecipeIngredients from "../RecipeIngredients";
 const RecipeFormIngredients = ({ measuringUnits, ingredients, addItem, removeItem, submitError }) => {
   const [values, setValues] = useState({
     amount: 1,
-    unitId: "DEFAULT",
+    unitId: 1,
     text: "",
   });
 
@@ -19,7 +19,7 @@ const RecipeFormIngredients = ({ measuringUnits, ingredients, addItem, removeIte
     const { amount, unitId, text } = values;
     if (amount && text) {
       addItem({ amount, unitId, text, unit: measuringUnits[values.unitId - 1]?.unit }, "ingredients");
-      setValues({ amount: 1, unitId: "DEFAULT", text: "" });
+      setValues({ amount: 1, unitId: 1, text: "" });
       if (error) setError("");
     } else {
       setError("All fields are required");
@@ -38,7 +38,6 @@ const RecipeFormIngredients = ({ measuringUnits, ingredients, addItem, removeIte
           name="amount"
           type="number"
           value={values.amount}
-          required={true}
           shrinkLabel={false}
           classes="font-bolder"
           cols="col col-sm-3"
@@ -52,15 +51,12 @@ const RecipeFormIngredients = ({ measuringUnits, ingredients, addItem, removeIte
             value={values.unitId}
             name="unitId"
             onChange={handleChange}
-            required
             
           >
-            <option disabled value="DEFAULT">
-              --
-            </option>
+            
             {measuringUnits.map((unit, i) => (
               <option key={`${unit}-${i}`} value={unit.id} label={unit.unit}>
-                {unit.unit}
+                {unit.unit || '--'}
               </option>
             ))}
           </select>
@@ -74,7 +70,6 @@ const RecipeFormIngredients = ({ measuringUnits, ingredients, addItem, removeIte
             placeholder="Example: soaked in vinegar"
             value={values.text}
             cols="col"
-            required={false}
             shrinkLabel={false}
             classes="form-label font-bolder"
             handleChange={handleChange}

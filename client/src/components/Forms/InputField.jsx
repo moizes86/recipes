@@ -7,7 +7,6 @@ const InputField = ({
   placeholder,
   value,
   max,
-  required,
   shrinkLabel = true,
   classes,
   cols,
@@ -30,8 +29,7 @@ const InputField = ({
           value={value}
           min="0"
           max={max}
-          required={required}
-          className={`form-control`}
+          className='form-control'
           onChange={handleChange}
           onBlur={(e) => {
             handleBlur && handleBlur(e);

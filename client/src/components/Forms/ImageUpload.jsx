@@ -7,24 +7,27 @@ const ImageUpload = ({ image_url, addImage, removeImage, errors }) => {
 
   const fileInputRef = useRef();
 
+  const displayImage = () => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreview(reader.result);
+    };
+    reader.readAsDataURL(imageFile);
+  };
   useEffect(() => {
     if (imageFile) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result);
-      };
-      reader.readAsDataURL(imageFile);
+      displayImage();
     } else {
       setPreview(null);
     }
   }, [imageFile]);
 
   const handleChange = ({ target: { files } }) => {
-    fileInputRef.current.click();
+    fileInputRef.current.click(); //display image
     const file = files[0];
     if (file && file.type.substr(0, 5) === "image") {
-      setImageFile(file);
-      addImage(file);
+      setImageFile(file); // local component
+      addImage(file); // RecipeForm component
       setError("");
     } else {
       setImageFile(null);
@@ -51,8 +54,8 @@ const ImageUpload = ({ image_url, addImage, removeImage, errors }) => {
       <small>{error}</small>
 
       <div className="d-flex justify-content-between">
-        <img src={preview ?? `${process.env.REACT_APP_SERVER_PATH}/${image_url}`} alt="" />
-        {imageFile && (
+        <img src={preview ?? `${process.env.REACT_APP_SERVER_PATH_FLASK}/${image_url}`} alt="" />
+        {(imageFile || image_url) && (
           <i
             className="far fa-trash-alt"
             id="11"

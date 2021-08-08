@@ -75,10 +75,10 @@ const Signup = () => {
           label="Email"
           name="email"
           type="email"
+          errors={errors.email}
           value={values.email}
           handleChange={handleChange}
           handleBlur={handleBlur}
-          errors={errors.email}
         />
 
         <InputField
@@ -86,29 +86,29 @@ const Signup = () => {
           name="username"
           type="text"
           value={values.username}
+          errors={errors.username}
           handleChange={handleChange}
           handleBlur={handleBlur}
-          errors={errors.username}
         />
 
         <InputField
           label="Password"
-          value={values.password}
           name="password"
           type="password"
+          value={values.password}
+          errors={errors.password}
           handleChange={handleChange}
           handleBlur={handleBlur}
-          errors={errors.password}
         />
 
         <InputField
           label="Confirm Password"
-          value={values.confirmPassword}
           name="confirmPassword"
           type="password"
+          value={values.confirmPassword}
+          errors={errors.confirmPassword}
           handleChange={handleChange}
           handleBlur={handleBlur}
-          errors={errors.confirmPassword}
         />
 
         {loading ? (

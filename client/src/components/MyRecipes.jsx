@@ -6,11 +6,14 @@ import "../styles/styles.scss";
 
 const MyRecipes = () => {
   const [recipes, setRecipes] = useState([]);
-  const { id } = useSelector((state) => state.activeUser);
+  const {
+    id,
+    _id: { $oid: _id },
+  } = useSelector((state) => state.activeUser);
   const history = useHistory();
 
   const getMyRecipesAsync = async () => {
-    const result = await getMyRecipes(id);
+    const result = await getMyRecipes(id??_id);
     setRecipes(result.data);
   };
   useEffect(() => {
@@ -25,10 +28,10 @@ const MyRecipes = () => {
             <tr
               key={`${recipe.title}-${i}`}
               id={recipe.id}
-              onClick={() => history.push(`edit-recipe/${recipe.id}`)}
+              onClick={() => history.push(`edit-recipe/${recipe.id ?? recipe._id['$oid']}`)}
             >
               <td className="col-1">
-                <img src={`${process.env.REACT_APP_SERVER_PATH}/${recipe.image_url}`} alt="" />
+                <img src={`${process.env.REACT_APP_SERVER_PATH_FLASK}/${recipe.image_url}`} alt="" />
               </td>
               <td>{recipe.title}</td>
             </tr>

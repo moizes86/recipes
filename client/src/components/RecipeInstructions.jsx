@@ -6,7 +6,7 @@ const RecipeInstructions = ({ instructions, removeItem, partOfForm = false }) =>
       <ol>
         {instructions.map((instruction, i) => (
           <div key={`${instruction.id}-${i}`} className="d-flex align-items-baseline justify-content-between">
-            <li className="py-2 px-2">{instruction.text}</li>
+            <li className="py-2 px-2">{instruction.text ?? instruction}</li>
 
             {partOfForm && (
               <i

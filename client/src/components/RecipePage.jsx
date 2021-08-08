@@ -10,27 +10,35 @@ import "../styles/styles.scss";
 
 import { useParams } from "react-router-dom";
 import { getRecipe } from "../services/API_Services/RecipeAPI";
+import useFetch from "../useFetch";
 
 const RecipePage = () => {
-  const { id } = useParams();
-  const [recipe, setRecipe] = useState("");
-  const [loading, setLoading] = useState(true);
-  const getRecipeAsync = async (id) => {
-    const result = await getRecipe(id);
-    setRecipe(result.data);
-    setLoading(false);
-  };
+  const { id, title } = useParams();
+  const [recipe, setRecipe] = useState(null);
+  const { sendRequest, loading, data, error, Spinner } = useFetch();
   useEffect(() => {
-    getRecipeAsync(id);
+    sendRequest(getRecipe, id, title);
   }, [id]);
+
+  useEffect(() => {
+
+    setRecipe(data);
+  }, [data]);
+
   return (
     <div className="recipe-page py-5">
-      {!loading && (
+      {loading || !data ? (
+        <Spinner />
+      ) : (
         <>
           <div className="row">
             <div className="col-sm-6">
-              <img src={`${process.env.REACT_APP_SERVER_PATH}/${recipe.image_url}`} alt="" />
-              <img className="background-img" src={`${process.env.REACT_APP_SERVER_PATH}/${recipe.image_url}`} alt="" />
+              <img src={`${process.env.REACT_APP_SERVER_PATH_FLASK}/${recipe.image_url}`} alt="" />
+              <img
+                className="background-img"
+                src={`${process.env.REACT_APP_SERVER_PATH_FLASK}/${recipe.image_url}`}
+                alt=""
+              />
             </div>
 
             <div className="col-sm-6">

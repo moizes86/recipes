@@ -11,7 +11,7 @@ const useFetch = () => {
     setError(null);
     try {
       const result = await cb(...params);
-      if (result.data.status && result.data.status !== 200) throw Error(result.data.err);
+      if (result.data.status && result.data.status !== 200) throw Error(result.data.message);
       const data = result.data;
       setData(data);
     } catch (e) {

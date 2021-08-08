@@ -10,7 +10,6 @@ const RecipeIngredients = ({ ingredients, removeItem, partOfForm = false }) => {
             <th scope="col">Unit</th>
             <th scope="col">Ingredient</th>
 
-            {partOfForm && <th scope="col"></th>}
           </tr>
         </thead>
         <tbody>

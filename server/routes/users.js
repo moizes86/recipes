@@ -39,7 +39,7 @@ router.post("/login", async (req, res) => {
       throw Error("Email or password incorrect");
     } else {
       res.cookie("user", user);
-      res.status(200).json(user);
+      res.status(200).json(user[0]);
     }
   } catch (e) {
     res.status(200).json({ status: 401, err: e.message, data: undefined });

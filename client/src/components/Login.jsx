@@ -62,13 +62,12 @@ const Login = () => {
   };
 
   useEffect(() => {
-    if (data?.length) {
-      dispatch(onLogin(data[0]));
+    if (data) {
+      dispatch(onLogin(data));
       setTimeout(() => {
         history.push("/");
       }, 2000);
     }
-    console.log(error);
   }, [data]);
 
   return (
@@ -79,9 +78,9 @@ const Login = () => {
           name="email"
           type="email"
           value={values.email}
+          errors={errors.email}
           handleChange={handleChange}
           handleBlur={handleBlur}
-          errors={errors.email}
         />
 
         <InputField
@@ -89,15 +88,15 @@ const Login = () => {
           name="password"
           type="password"
           value={values.password}
+          errors={errors.password}
           handleChange={handleChange}
           handleBlur={handleBlur}
-          errors={errors.password}
         />
 
         {loading ? (
           <Spinner />
         ) : data ? (
-          <CheckCircleSuccess message="Registration Successful. Redirecting..." />
+          <CheckCircleSuccess message="Welcome. Redirecting..." />
         ) : (
           <CustomButton>Login</CustomButton>
         )}

@@ -9,6 +9,7 @@ import {
   editRecipe,
 } from "../../services/API_Services/RecipeAPI";
 
+import { useSelector } from "react-redux";
 import { useParams, useLocation } from "react-router-dom";
 import useFetch from "../../useFetch";
 
@@ -19,9 +20,9 @@ import Ingredients from "./RecipeFormIngredients";
 import Instructions from "./RecipeFormInstructions";
 import ImageUpload from "./ImageUpload";
 import CheckCircleSuccess from "../CheckCircleSuccess";
+import CustomButton from "../CustomButton";
 
 import "../../styles/styles.scss";
-import CustomButton from "../CustomButton";
 
 const { validationsAPI } = require("../../DAL/validations");
 
@@ -42,6 +43,7 @@ const initialValues = {
 const RecipeForm = () => {
   const location = useLocation();
   const params = useParams();
+  const { _id:{$oid:user_id} } = useSelector((state) => state.activeUser);
   const { sendRequest, loading, data, error, Spinner } = useFetch();
 
   // STATES
@@ -94,11 +96,12 @@ const RecipeForm = () => {
 
     data.dietsSelected = data.dietsSelected.map((diet) => diet.id);
     data.categoriesSelected = data.categoriesSelected.map((category) => category.id);
+    // data.ingredients = JSON.parse(data.ingredients)
+    // data.instructions = JSON.parse(data.instructions)
 
     // Add deleted items props, will be used to delete them from db
-    data.ingredientsDeleted = [];
-    data.instructionsDeleted = [];
-
+    // data.ingredientsDeleted = [];
+    // data.instructionsDeleted = [];
     setValues(data);
   };
 
@@ -107,7 +110,7 @@ const RecipeForm = () => {
     if (location.pathname.includes("/edit-recipe")) {
       getRecipeAsync();
     } else {
-      setValues({ ...initialValues });
+      setValues({ user_id, ...initialValues });
     }
   }, [location]);
 
@@ -157,47 +160,51 @@ const RecipeForm = () => {
 
   const removeImage = () => setValues({ ...values, image_url: null });
 
+  const scrollToError = (e) => {
+    // Toggle class  'show' where error has occured to enable scrolling
+    let targetEl = document.querySelector(`.accordion #${e.field}`);
+    while (!Array.from(targetEl.classList).includes("collapse")) {
+      targetEl = targetEl.parentElement;
+    }
+    if (!Array.from(targetEl.classList).includes("show")) targetEl.classList.toggle("show");
+    document.querySelector(`#${e.field}`).scrollIntoView({ behavior: "smooth", block: "center" }); // scroll to element
+  };
   // SUBMITTING
 
   const validateForm = () => {
-    const { title, cook, source_url, description, ingredients, instructions, servings, image_url } = values;
+    const { title, source_url, description, ingredients, instructions } = values;
     try {
       validationsAPI.recipeTitle(title);
       validationsAPI.description(description);
-      validationsAPI.cook(cook);
-      validationsAPI.servings(servings);
       validationsAPI.ingredients(ingredients);
       validationsAPI.instructions(instructions);
-      validationsAPI.image(image_url);
       if (source_url) validationsAPI.url(source_url);
       return true;
     } catch (e) {
       setErrors({ [e.field]: e.message });
-
-      // Toggle class  'show' where error has occured to enable scrolling
-      let targetEl = document.querySelector(`.accordion #${e.field}`);
-      while (!Array.from(targetEl.classList).includes("collapse")) {
-        targetEl = targetEl.parentElement;
-      }
-      if (!Array.from(targetEl.classList).includes("show")) targetEl.classList.toggle("show");
-      document.querySelector(`#${e.field}`).scrollIntoView({ behavior: "smooth", block: "center" }); // scroll to element
+      scrollToError(e);
 
       return false;
     }
+  };
+
+  const valuesToFormData = () => {
+    const formData = new FormData();
+    for (const value in values) {
+      if (values[value] instanceof Object && value !== "image_url") {
+        formData.append(value, JSON.stringify(values[value]));
+      } else {
+        formData.append(value, values[value]);
+      }
+    }
+    return formData;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       if (validateForm()) {
-        const formData = new FormData();
-        for (const value in values) {
-          if (values[value] instanceof Object && value !== "image_url") {
-            formData.append(value, JSON.stringify(values[value]));
-          } else {
-            formData.append(value, values[value]);
-          }
-        }
+        const formData = valuesToFormData();
 
         if (location.pathname === "/add-recipe") {
           await sendRequest(addRecipe, formData);
@@ -238,8 +245,8 @@ const RecipeForm = () => {
                   type="text"
                   placeholder="Enter recipe name"
                   value={values.title}
-                  shrinkLabel={false}
                   errors={errors.title}
+                  shrinkLabel={false}
                   classes="font-bolder pl-0"
                   cols="col col-md-6"
                   handleChange={handleChange}
@@ -251,7 +258,6 @@ const RecipeForm = () => {
                   type="text"
                   placeholder="Where is this from?"
                   value={values.source}
-                  required={false}
                   shrinkLabel={false}
                   classes="font-bolder  pl-0"
                   cols="col-12 col-md-6"
@@ -266,7 +272,6 @@ const RecipeForm = () => {
                 placeholder="Enter a valid link"
                 value={values.source_url}
                 errors={errors.source_url}
-                required={false}
                 shrinkLabel={false}
                 classes="font-bolder col col-md-6 pl-0"
                 handleChange={handleChange}
@@ -331,7 +336,6 @@ const RecipeForm = () => {
                   type="number"
                   value={values.cook}
                   errors={errors.cook}
-                  required={false}
                   shrinkLabel={false}
                   classes="font-bolder"
                   cols="col col-md-3 mr-4"

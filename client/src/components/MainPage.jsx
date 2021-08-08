@@ -32,6 +32,7 @@ const MainPage = () => {
       </div>
 
       {loading ? <Spinner /> : <Gallery />}
+      {error && <small>{error}</small>}
     </div>
   );
 };

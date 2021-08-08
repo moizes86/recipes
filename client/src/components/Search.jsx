@@ -19,13 +19,9 @@ const Search = () => {
   const { sendRequest, loading, data, error, Spinner } = useFetch();
 
   useEffect(() => {
-    const delayedSearch = setTimeout(async () => {
+    const delayedSearch = setTimeout(() => {
       if (query.length) {
-        const searchResult = await searchRecipe(query);
-        setResults(searchResult.data);
-      } else if (!query) {
-        await sendRequest(getRecipes);
-        setResults(data);
+        sendRequest(searchRecipe, query);
       } else {
         setResults([]);
       }
@@ -33,6 +29,10 @@ const Search = () => {
 
     return () => clearTimeout(delayedSearch);
   }, [query]);
+
+  useEffect(() => {
+    setResults(data);
+  }, [data]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -58,13 +58,17 @@ const Search = () => {
           }
         />
         <div className="icon">
-          <i
-            className="fa fa-search"
-            onClick={(e) => {
-              handleSubmit(e);
-              document.querySelector(".gallery").scrollIntoView({ behavior: "smooth", block: "start" });
-            }}
-          />
+          {loading ? (
+              <Spinner />
+          ) : (
+            <i
+              className="fa fa-search"
+              onClick={(e) => {
+                handleSubmit(e);
+                document.querySelector(".gallery").scrollIntoView({ behavior: "smooth", block: "start" });
+              }}
+            />
+          )}
         </div>
       </div>
 

@@ -85,7 +85,7 @@ export const validationsAPI = {
   ingredients(ingredients) {
     if (!ingredients.length) throw new CustomError("ingredients", "Ingredients are required");
     ingredients.forEach((ingredient) => {
-      if (!ingredient.text || !ingredient.unitId) throw new CustomError("ingredients", "Invalid ingredient");
+      if (!ingredient.text) throw new CustomError("ingredients", "Invalid ingredient");
     });
   },
 

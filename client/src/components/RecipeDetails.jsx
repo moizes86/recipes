@@ -33,10 +33,10 @@ const RecipeDetails = ({
         </p>
 
         <div className="bottom-line-icons">
-          <i class="far fa-clock mr-3">
+          <i className="far fa-clock mr-3">
             <span className="ml-1">{cook}</span>
           </i>
-          <i class="far fa-utensils mr-3">
+          <i className="far fa-utensils mr-3">
             <span className="ml-1">{servings}</span>
           </i>
         </div>

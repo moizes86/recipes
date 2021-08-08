@@ -3,7 +3,7 @@ import "./styles/styles.scss";
 
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 // Redux
-import { checkUserLoggedIn } from "./services/API_Services/UserAPI";
+import { isCookie } from "./services/API_Services/UserAPI";
 import { useDispatch } from "react-redux";
 
 // import App from "./App";
@@ -20,11 +20,11 @@ import { onLogin } from "./redux/actions";
 function App() {
   const dispatch = useDispatch();
   const checkUserLoggedInAsync = async () => {
-    const result = await checkUserLoggedIn();
+    const result = await isCookie();
     dispatch(onLogin(result.data[0]));
   };
 
-  useEffect(() => checkUserLoggedInAsync());
+  // useEffect(() => checkUserLoggedInAsync());
 
   return (
     <div className="App">
@@ -36,7 +36,7 @@ function App() {
               <Route exact path="/" component={MainPage} />
               <Route exact path="/signup" component={Signup} />
               <Route exact path="/login" component={Login} />
-              <Route exact path="/recipes/:id" component={RecipePage} />
+              <Route exact path="/recipes/:id/:title" component={RecipePage} />
               <Route exact path={["/add-recipe", "/edit-recipe/:recipeId"]} component={RecipeForm} />
               <Route exact path="/my-profile" component={MyProfile} />
               <Route exact path="/my-recipes" component={MyRecipes} />

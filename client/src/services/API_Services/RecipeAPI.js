@@ -36,9 +36,9 @@ export const getDiffictultyLevels = async () => {
 //   return await httpPut(`${url}/edit-recipe`, data);
 // };
 
-export const searchRecipe = async (data) => {
-  return await httpGet(`${url}/search?q=${data}`);
-};
+// export const searchRecipe = async (data) => {
+//   return await httpGet(`${url}/search?q=${data}`);
+// };
 
 // export const getMyRecipes = async (id) => {
 //   return await httpGet(`${url}/my-recipes?userId=${id}`);
@@ -97,7 +97,6 @@ export const getCategories = async () => {
 };
 
 export const addRecipe = async (data) => {
-  console.log(data)
   return await axios.post(`${url_flask}/add-recipe`, data, config);
 };
 
@@ -108,3 +107,11 @@ export const getMyRecipes = async (id) => {
 export const editRecipe = async (data) => {
   return await axios.put(`${url_flask}/edit-recipe`, data, config);
 };
+
+export const searchRecipe = async (data) => {
+  return await axios.get(`${url_flask}/search?q=${data}`);
+};
+
+export const deleteRecipe = async(recipeId)=>{
+  return axios.delete(`${url_flask}/delete?recipeId=${recipeId}`)
+}

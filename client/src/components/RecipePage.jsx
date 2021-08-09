@@ -9,7 +9,7 @@ import RecipeInstructions from "./RecipeInstructions";
 import "../styles/styles.scss";
 
 import { useParams } from "react-router-dom";
-import { getRecipe } from "../services/API_Services/RecipeAPI";
+import { getCategories, getDiets, getRecipe } from "../services/API_Services/RecipeAPI";
 import useFetch from "../useFetch";
 
 const RecipePage = () => {
@@ -21,7 +21,6 @@ const RecipePage = () => {
   }, [id]);
 
   useEffect(() => {
-
     setRecipe(data);
   }, [data]);
 

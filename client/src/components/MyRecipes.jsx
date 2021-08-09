@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getMyRecipes } from "../services/API_Services/RecipeAPI";
+import { deleteRecipe, getMyRecipes } from "../services/API_Services/RecipeAPI";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import "../styles/styles.scss";
@@ -28,12 +28,22 @@ const MyRecipes = () => {
             <tr
               key={`${recipe.title}-${i}`}
               id={recipe.id}
-              onClick={() => history.push(`edit-recipe/${recipe.id ?? recipe._id['$oid']}`)}
+              onClick={() => history.push(`edit-recipe/${recipe.id ?? recipe._id["$oid"]}`)}
             >
               <td className="col-1">
                 <img src={`${process.env.REACT_APP_SERVER_PATH_FLASK}/${recipe.image_url}`} alt="" />
               </td>
               <td>{recipe.title}</td>
+              <td>
+                <i
+                  className="far fa-trash-alt"
+                  
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    deleteRecipe(recipe._id["$oid"]);
+                  }}
+                ></i>
+              </td>
             </tr>
           ))}
         </tbody>

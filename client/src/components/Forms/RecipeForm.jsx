@@ -94,8 +94,8 @@ const RecipeForm = () => {
     const { recipeId } = params;
     let { data } = await getRecipe(recipeId);
 
-    data.dietsSelected = data.dietsSelected.map((diet) => diet.id);
-    data.categoriesSelected = data.categoriesSelected.map((category) => category.id);
+    // data.dietsSelected = data.dietsSelected.map((diet) => diet.id??diet.diet_id);
+    // data.categoriesSelected = data.categoriesSelected.map((category) => category.id??category.category_id);
     // data.ingredients = JSON.parse(data.ingredients)
     // data.instructions = JSON.parse(data.instructions)
 
@@ -108,9 +108,9 @@ const RecipeForm = () => {
   useEffect(() => {
     getOptionsAsync();
     if (location.pathname.includes("/edit-recipe")) {
-      getRecipeAsync();
+      return getRecipeAsync();
     } else {
-      setValues({ user_id, ...initialValues });
+      return setValues({ user_id, ...initialValues });
     }
   }, [location]);
 
@@ -120,11 +120,11 @@ const RecipeForm = () => {
     setValues({ ...values, [name]: value });
   };
 
-  const handleCheck = ({ target: { name, checked, id } }) => {
+  const handleCheck = ({ target: { name, checked, id,value } }) => {
     if (checked) {
-      values[name].push(+id);
+      values[name].push({id:+id, title:value});
     } else {
-      values[name] = values[name].filter((item) => item !== +id);
+      values[name] = values[name].filter((item) => item.id !== +id);
     }
     setValues({ ...values });
   };

@@ -11,7 +11,7 @@ const SearchAutoComplete = ({ results, inputIsFocused }) => {
             key={`${result.title}-${result.id}`}
             id={result.id}
             onClick={(e) => {
-              history.push(`/recipes/${result.id}`);
+              history.push(`/recipes/${result.id??result._id.$oid+'/'+result.title }`);
             }}
           >
             {result.title}

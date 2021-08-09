@@ -652,6 +652,10 @@ i:hover {
         max-height: 100%;
         width: 100px;
       }
+
+      &:last-child{
+        text-align: end;
+      }
     }
   }
 }

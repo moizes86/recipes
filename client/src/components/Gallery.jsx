@@ -5,7 +5,6 @@ import { useSelector, useDispatch } from "react-redux";
 
 const Gallery = () => {
   let { loading, recipes } = useSelector((state) => state);
-  
   useEffect(() => {
     
   }, [recipes])

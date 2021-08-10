@@ -93,7 +93,7 @@ export const getMeasuringUnits = async () => {
 };
 
 export const getCategories = async () => {
-  return await axios.get(`${url_flask}/categories`, config);
+  return await axios.get(`${url_flask}/categories`);
 };
 
 export const addRecipe = async (data) => {

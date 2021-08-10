@@ -66,35 +66,33 @@ def get_categories():
 
 @recipes.route('/add-recipe', methods=['POST'])
 def add_recipe():
-    data = request.form.to_dict()
-    img = request.files.get('image_url')
-    filename = secure_filename(img.filename)
-    img.save(os.path.join('public\\images', filename))
+    data = Recipes.before_add_recipe(request.form, request.files)
+    try:
+        return Response(Recipes(**data).save(), 200)
+    except Exception('Error adding recipe') as s:
+        return Response(s, 400)
 
-    dietsSelected = json.loads(data['dietsSelected'])
-    categoriesSelected = json.loads(data['categoriesSelected'])
-    data['dietsSelected'] = json.loads(Diets.objects.filter(diet_id__in=dietsSelected).exclude("id").to_json())
-    data['categoriesSelected'] = json.loads(
-        Categories.objects.filter(category_id__in=categoriesSelected).exclude("id").to_json())
-    data['ingredients'] = json.loads(data['ingredients'])
-    data['instructions'] = json.loads(data['instructions'])
-    data['image_url'] = 'public\\images\\' + filename
-    return Response(Recipes(**data).save(), 200)
 
 
 @recipes.route('/edit-recipe', methods=['PUT'])
 def update_recipe():
     update_details = Recipes.before_update_recipe(request.form, request.files)
-    recipe_id = str(request.data['_id'])
-    print(recipe_id)
+    recipe_id = request.form['_id']
+    recipe_id = json.loads(recipe_id)['$oid']
 
-    return Response(Recipes.objects(_id=recipe_id).update(**update_details), 200)
+    try:
+        Recipes.objects(_id=recipe_id).update(**update_details)
+        return Response('Recipe was updated successfully', 200)
+    except Exception('Error updating recipe') as s:
+        return Response(s, 400)
+
 
 
 @recipes.route('/my-recipes')
 def get_my_recipes():
     userId = request.args.get('userId')
     return Response(Recipes.objects(user_id=userId).to_json(), 200)
+
 
 @recipes.route('/search')
 def search_recipe():

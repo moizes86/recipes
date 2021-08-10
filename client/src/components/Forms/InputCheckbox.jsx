@@ -17,7 +17,7 @@ const InputCheckbox = ({ name, items, handleCheck, itemsSelected = [], title }) 
               value={item.title}
               id={item.id}
               onChange={handleCheck}
-              checked={itemsSelected.map(item=>item.id).includes(item.id)}
+              checked={itemsSelected.map(item=>item.title).includes(item.title)}
             />
             {item.title}
           </label>

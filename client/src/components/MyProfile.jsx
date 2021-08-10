@@ -9,14 +9,18 @@ import { validationsAPI } from "../DAL/validations";
 import { useDispatch, useSelector } from "react-redux";
 import { onLoading, onUpdateUser } from "../redux/actions";
 
+import useFetch from "../useFetch";
+
 // Routing
 import { history, useHistory } from "react-router-dom";
 import { getUserById, updateUserDetails } from "../services/API_Services/UserAPI";
+import CheckCircleSuccess from "./CheckCircleSuccess";
 
 const MyProfile = () => {
   const dispatch = useDispatch();
   const history = useHistory();
-  let { activeUser, loading } = useSelector((state) => state);
+  let { activeUser } = useSelector((state) => state);
+  const { sendRequest, loading, data, error, Spinner } = useFetch();
 
   const [values, setValues] = useState({
     ...activeUser,
@@ -32,6 +36,7 @@ const MyProfile = () => {
 
   useEffect(() => {
     if (!activeUser) return history.push("/");
+    return ()=>{}
   }, [activeUser, history]);
 
   const handleBlur = ({ target: { name, value } }) => {
@@ -46,6 +51,7 @@ const MyProfile = () => {
 
   const handleChange = ({ target: { name, value } }) => {
     setValues({ ...values, [name]: value });
+    data=null
   };
 
   const handleSubmit = async (e) => {
@@ -58,11 +64,21 @@ const MyProfile = () => {
       validationsAPI.password(values.password);
       validationsAPI.confirmPassword(values.confirmPassword, values.password);
 
-      const { id, username, password, confirmPassword } = values;
-      const updateResponse = await updateUserDetails({ id, username, password, confirmPassword });
+      const {
+        _id: { $oid: id },
+        username,
+        password,
+        confirmPassword,
+      } = values;
+      const updateResponse = await sendRequest(updateUserDetails, {
+        id,
+        username,
+        password,
+        confirmPassword,
+      });
       if (updateResponse.status === 200) {
         setUpdateSuccess(true);
-        dispatch(onUpdateUser({...updateResponse.data}));
+        dispatch(onUpdateUser({ ...updateResponse.data }));
       } else {
         setErrors("Something went wrong");
       }
@@ -71,16 +87,13 @@ const MyProfile = () => {
     }
   };
 
-  return loading ? (
-    "LOADING"
-  ) : (
+  return (
     <div className="my-profile">
       <form onSubmit={handleSubmit} noValidate>
         <InputField
           label="Username"
           name="username"
           type="text"
-          placeholder="Enter username"
           value={values.username}
           errors={errors.username}
           handleChange={handleChange}
@@ -109,7 +122,15 @@ const MyProfile = () => {
 
         {updateSuccess && <p>Update Success</p>}
 
-        <CustomButton>Submit</CustomButton>
+        {loading ? (
+          <Spinner />
+        ) : data ? (
+          <CheckCircleSuccess message={data} />
+        ) : error ? (
+          <small>{error}</small>
+        ) : (
+          <CustomButton>Submit</CustomButton>
+        )}
       </form>
     </div>
   );

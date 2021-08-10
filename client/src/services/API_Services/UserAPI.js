@@ -56,6 +56,7 @@ const config = {
     "Access-Control-Allow-Origin": "http://localhost:3000",
     "Access-Control-Allow-Credentials": true,
   },
+  withCredentials: true,
 };
 
 
@@ -76,5 +77,5 @@ export const logoutUser = async () => {
 };
 
 export const updateUserDetails = async (details) => {
-  return httpPut(`${url_flask_users}/update-details`, details, config);
+  return axios.put(`${url_flask_users}/update-details`, details, config);
 };

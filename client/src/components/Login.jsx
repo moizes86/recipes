@@ -58,7 +58,7 @@ const Login = () => {
       return;
     }
 
-      await sendRequest(loginUser, values);
+    await sendRequest(loginUser, values);
   };
 
   useEffect(() => {
@@ -68,6 +68,7 @@ const Login = () => {
         history.push("/");
       }, 2000);
     }
+    return () => {};
   }, [data]);
 
   return (
@@ -94,7 +95,9 @@ const Login = () => {
         />
 
         {loading ? (
-          <Spinner />
+          <div className="d-flex justify-content-center">
+            <Spinner />
+          </div>
         ) : data ? (
           <CheckCircleSuccess message="Welcome. Redirecting..." />
         ) : (

@@ -124,7 +124,7 @@ const RecipeForm = () => {
     if (checked) {
       values[name].push({id:+id, title:value});
     } else {
-      values[name] = values[name].filter((item) => item.id !== +id);
+      values[name] = values[name].filter((item) => item.title !== value);
     }
     setValues({ ...values });
   };
@@ -446,7 +446,7 @@ const RecipeForm = () => {
       {loading ? (
         <Spinner />
       ) : data ? (
-        <CheckCircleSuccess message="updated successfully" />
+        <CheckCircleSuccess message="Recipe was added successfully" />
       ) : (
         <CustomButton type="submit">
           {location.pathname === "/add-recipe" ? "Add Recipe" : "Save"}

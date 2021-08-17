@@ -60,12 +60,10 @@ router.post("/logout", async (req, res) => {
 /* Update user's details */
 router.put("/update-details", async (req, res) => {
   try {
-    const { id, username, password, confirmPassword } = req.body;
-
+    const [id, username, password, confirmPassword] = req.body;
     validationsAPI.username(username);
     validationsAPI.password(password);
     validationsAPI.confirmPassword(confirmPassword, password);
-
     const [result] = await usersAPI.updateDetails(id, username, password);
     res.status(200).json({ id, username, password, confirmPassword });
   } catch (e) {

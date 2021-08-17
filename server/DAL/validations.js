@@ -40,7 +40,7 @@ const validationsAPI = {
     if (confirmPassword !== password) throw Error("Passwords do not match");
   },
 
-  recipeTitle(title) {
+  title(title) {
     this.required("Title", title);
     if (title.length < 4) throw Error("Title must be at least four chars");
     if (title.length > 45) throw Error("Title is too long! Maximum 45 chars");
@@ -53,11 +53,11 @@ const validationsAPI = {
   },
 
   servings(n) {
-    if (n < 1 || n > 10) throw Error("Servings must be between 1-10");
+    if (n < 0 || n > 10) throw Error("Servings must be between 1-10");
   },
 
   cook(n) {
-    if (n < 1) throw Error("Invalid cook time");
+    if (n < 0) throw Error("Invalid cook time");
   },
 
   image(image) {

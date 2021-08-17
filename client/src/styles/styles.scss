@@ -40,6 +40,12 @@ input[type="number"]::-webkit-outer-spin-button {
   opacity: 1;
 }
 
+*,
+*::after,
+*::before {
+  box-sizing: content-box;
+}
+
 // Custom Classes
 
 .font-smaller {
@@ -287,6 +293,11 @@ i:hover {
   @media #{$break_lg} {
     margin-bottom: 100px;
   }
+  @media #{$break_xs} {
+    border-radius: 0;
+    margin-top: -50px;
+    padding-bottom: 0;
+  }
 
   .background-img {
     position: fixed;
@@ -303,6 +314,7 @@ i:hover {
   @media #{$break_md}, #{$break_lg} {
     width: 750px;
     padding: 40px;
+    padding-bottom: 80px;
   }
   .recipe-details {
     a {
@@ -404,15 +416,8 @@ i:hover {
   }
 
   .custom-button {
-    margin-bottom: 20px;
-
-    @media #{$break_xs} {
-      margin-bottom: 50px;
-    }
+    margin-bottom: 50px;
   }
-  // .narrow {
-  //   width: 70px !important;
-  // }
 }
 
 .recipe-form-items {
@@ -664,8 +669,48 @@ i:hover {
   input:hover {
     cursor: pointer;
   }
-  img {
-    height: 200px;
+  .row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 20px;
+
+    .image-preview {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      overflow-y: hidden;
+
+      img {
+        width: 100%;
+        max-height: 200px;
+      }
+
+      .pannel {
+        position: absolute;
+        bottom: -20px;
+        opacity: 0;
+        transition: bottom 0.5s opacity 0.5s;
+        width: 100%;
+      }
+    }
+    .image-preview:hover {
+      img {
+        @include my-hover;
+        opacity: 0.3;
+      }
+      .pannel {
+        opacity: 1;
+        bottom: 0px;
+
+        i {
+          position: absolute;
+          right: 10px;
+          bottom: 10px;
+          margin-right: 10px;
+        }
+      }
+    }
   }
 
   i {
@@ -680,5 +725,14 @@ i:hover {
     color: #198754;
     font-size: 30px;
     margin-bottom: 10px;
+  }
+}
+
+.carousel-container {
+  .carousel-inner {
+    height: 250px;
+    img {
+      height: 250px;
+    }
   }
 }

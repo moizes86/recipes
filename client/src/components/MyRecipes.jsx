@@ -8,12 +8,12 @@ const MyRecipes = () => {
   const [recipes, setRecipes] = useState([]);
   const {
     id,
-    _id: { $oid: _id },
+    /*_id: { $oid: _id },*/
   } = useSelector((state) => state.activeUser);
   const history = useHistory();
 
   const getMyRecipesAsync = async () => {
-    const result = await getMyRecipes(id??_id);
+    const result = await getMyRecipes(id /*??_id*/);
     setRecipes(result.data);
   };
   useEffect(() => {
@@ -28,18 +28,17 @@ const MyRecipes = () => {
             <tr
               key={`${recipe.title}-${i}`}
               id={recipe.id}
-              onClick={() => history.push(`edit-recipe/${recipe.id ?? recipe._id["$oid"]}`)}
+              onClick={() => history.push(`edit-recipe/${recipe.id /*?? recipe._id["$oid"]*/}`)}
             >
               <td className="col-1">
-                <img src={`${process.env.REACT_APP_SERVER_PATH_FLASK}/${recipe.image_url}`} alt="" />
+                <img src={`${process.env.REACT_APP_SERVER_PATH}/${recipe.urls}`} alt="" />
               </td>
               <td>{recipe.title}</td>
               <td>
                 <i
                   className="far fa-trash-alt"
-                  
                   onClick={(e) => {
-                    e.stopPropagation()
+                    e.stopPropagation();
                     deleteRecipe(recipe._id["$oid"]);
                   }}
                 ></i>

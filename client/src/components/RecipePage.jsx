@@ -11,6 +11,7 @@ import "../styles/styles.scss";
 import { useParams } from "react-router-dom";
 import { getCategories, getDiets, getRecipe } from "../services/API_Services/RecipeAPI";
 import useFetch from "../useFetch";
+import MyCarousel from "./MyCarousel";
 
 const RecipePage = () => {
   const { id, title } = useParams();
@@ -25,19 +26,24 @@ const RecipePage = () => {
   }, [data]);
 
   return (
-    <div className="recipe-page py-5">
+    <div className="recipe-page">
       {loading || !data ? (
         <Spinner />
       ) : (
         <>
           <div className="row">
             <div className="col-sm-6">
-              <img src={`${process.env.REACT_APP_SERVER_PATH_FLASK}/${recipe.image_url}`} alt="" />
               <img
                 className="background-img"
-                src={`${process.env.REACT_APP_SERVER_PATH_FLASK}/${recipe.image_url}`}
+                src={`${process.env.REACT_APP_SERVER_PATH}/${recipe.images[0]}`}
                 alt=""
               />
+
+              {recipe.images.length === 1 ? (
+                <img src={`${process.env.REACT_APP_SERVER_PATH}/${recipe.images[0]}`} alt="" />
+              ) : (
+                <MyCarousel urls={recipe.images} />
+              )}
             </div>
 
             <div className="col-sm-6">

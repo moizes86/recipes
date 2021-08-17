@@ -24,7 +24,7 @@ function App() {
     dispatch(onLogin(result.data[0]));
   };
 
-  // useEffect(() => checkUserLoggedInAsync());
+  useEffect(() => checkUserLoggedInAsync());
 
   return (
     <div className="App">

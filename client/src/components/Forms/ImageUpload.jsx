@@ -1,37 +1,50 @@
 import React, { useState, useRef, useEffect } from "react";
+import { validationsAPI } from "../../DAL/validations";
 
-const ImageUpload = ({ image_url, addImage, removeImage, errors }) => {
-  const [imageFile, setImageFile] = useState(null);
-  const [preview, setPreview] = useState(null);
+const ImageUpload = ({ images: urls, setImagesInFormState, errors }) => {
+  const [uploadedImages, setUploadedImages] = useState([]);
+  const [preview, setPreview] = useState([]);
   const [error, setError] = useState("");
 
-  const fileInputRef = useRef();
-
-  const displayImage = () => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setPreview(reader.result);
-    };
-    reader.readAsDataURL(imageFile);
-  };
   useEffect(() => {
-    if (imageFile) {
-      displayImage();
-    } else {
-      setPreview(null);
+    if (uploadedImages) {
+      displayUploadedImages();
     }
-  }, [imageFile]);
+  }, [uploadedImages]);
+
+  const displayUploadedImages = () => {
+    const previews = [];
+    uploadedImages.forEach((uploadedImage) => {
+      const objectUrl = URL.createObjectURL(uploadedImage);
+      previews.push(objectUrl);
+    });
+    setPreview(previews);
+  };
+
+  const popImage = ({ target: { id } }) => {
+    const imagesArr = uploadedImages.filter((uploadedImage) => uploadedImage.name !== id);
+    setUploadedImages(imagesArr);
+    setImagesInFormState(imagesArr);
+  };
 
   const handleChange = ({ target: { files } }) => {
-    fileInputRef.current.click(); //display image
-    const file = files[0];
-    if (file && file.type.substr(0, 5) === "image") {
-      setImageFile(file); // local component
-      addImage(file); // RecipeForm component
-      setError("");
-    } else {
-      setImageFile(null);
-      setError("Invalid image");
+    setError("");
+
+    if (files.length > 4) return setError("Maximum 4 images");
+
+    if (files.length) {
+      const imagesArr = [];
+
+      try {
+        Array.from(files).forEach((file) => {
+          validationsAPI.image(file);
+          imagesArr.push(file); // local component
+        });
+      } catch (error) {
+        setError(error.message);
+      }
+      setUploadedImages(imagesArr);
+      setImagesInFormState(imagesArr);
     }
   };
 
@@ -40,33 +53,35 @@ const ImageUpload = ({ image_url, addImage, removeImage, errors }) => {
       <div className="custom-file mb-4">
         <input
           type="file"
+          name="images"
           className="custom-file-input"
           id="customFile"
           onChange={handleChange}
-          ref={fileInputRef}
           accept="image/*"
+          multiple={true}
         />
         <label htmlFor="customFile" className="custom-file-label">
-          {imageFile?.name ?? image_url ?? "Select File"}
+          Select File
         </label>
       </div>
       <br />
       <small>{error}</small>
 
-      <div className="d-flex justify-content-between">
-        <img src={preview ?? `${process.env.REACT_APP_SERVER_PATH_FLASK}/${image_url}`} alt="" />
-        {(imageFile || image_url) && (
-          <i
-            className="far fa-trash-alt"
-            id="11"
-            title="instructions"
-            index="0"
-            onClick={() => {
-              removeImage();
-              setImageFile(null);
-            }}
-          ></i>
-        )}
+      <div className="row justify-content-between">
+        {uploadedImages.length
+          ? uploadedImages.map((image, i) => (
+              <div className="image-preview" key={image.name}>
+                <img src={preview[i]} alt="" />
+                <div className="pannel">
+                  <i className="fas fa-trash-alt text-danger" onClick={popImage} id={image.name}></i>
+                </div>
+              </div>
+            ))
+          : urls.map((url, i) => (
+              <div className="image-preview" key={url}>
+                <img src={`${process.env.REACT_APP_SERVER_PATH}/${url}`} alt="" />
+              </div>
+            ))}
       </div>
       <small>{errors}</small>
     </div>

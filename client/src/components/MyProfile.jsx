@@ -36,7 +36,7 @@ const MyProfile = () => {
 
   useEffect(() => {
     if (!activeUser) return history.push("/");
-    return ()=>{}
+    return () => {};
   }, [activeUser, history]);
 
   const handleBlur = ({ target: { name, value } }) => {
@@ -51,12 +51,10 @@ const MyProfile = () => {
 
   const handleChange = ({ target: { name, value } }) => {
     setValues({ ...values, [name]: value });
-    data=null
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     setErrors({});
 
     try {
@@ -65,17 +63,13 @@ const MyProfile = () => {
       validationsAPI.confirmPassword(values.confirmPassword, values.password);
 
       const {
-        _id: { $oid: id },
-        username,
-        password,
-        confirmPassword,
-      } = values;
-      const updateResponse = await sendRequest(updateUserDetails, {
+        // _id: { $oid: id },
         id,
         username,
         password,
         confirmPassword,
-      });
+      } = values;
+      const updateResponse = await sendRequest(updateUserDetails, [id, username, password, confirmPassword]);
       if (updateResponse.status === 200) {
         setUpdateSuccess(true);
         dispatch(onUpdateUser({ ...updateResponse.data }));
@@ -125,11 +119,12 @@ const MyProfile = () => {
         {loading ? (
           <Spinner />
         ) : data ? (
-          <CheckCircleSuccess message={data} />
-        ) : error ? (
-          <small>{error}</small>
+          <CheckCircleSuccess message={data.message} />
         ) : (
-          <CustomButton>Submit</CustomButton>
+          <>
+            <CustomButton>Submit</CustomButton>
+            <small>{error}</small>
+          </>
         )}
       </form>
     </div>

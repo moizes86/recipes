@@ -78,8 +78,9 @@ export const validationsAPI = {
 
   image(image) {
     if (image.type && image?.type?.substr(0, 5) !== "image")
-      throw new CustomError("image_url", "Invalid file- images only");
-    if (image.size > 1024 * 1024 * 5) throw new CustomError("image_url", "Maximum size 5 mb");
+      throw new CustomError("image_url", `Error in ${image.name}: Invalid file- images only`);
+    if (image.size > 1024 * 1024 * 5)
+      throw new CustomError("image_url", `Error in ${image.name}: Maximum size 5 mb`);
   },
 
   ingredients(ingredients) {

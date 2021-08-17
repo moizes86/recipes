@@ -9,7 +9,7 @@ import {
   editRecipe,
 } from "../../services/API_Services/RecipeAPI";
 
-import { useSelector } from "react-redux";
+// import { useSelector } from "react-redux";
 import { useParams, useLocation } from "react-router-dom";
 import useFetch from "../../useFetch";
 
@@ -26,11 +26,11 @@ import "../../styles/styles.scss";
 
 const { validationsAPI } = require("../../DAL/validations");
 
-const initialValues = {
+let initialValues = {
   title: "",
   source: "",
   source_url: "",
-  image_url: null,
+  images: [],
   description: "",
   dietsSelected: [],
   categoriesSelected: [],
@@ -40,79 +40,82 @@ const initialValues = {
   servings: 0,
 };
 
-const RecipeForm = () => {
-  const location = useLocation();
-  const params = useParams();
-  const { _id:{$oid:user_id} } = useSelector((state) => state.activeUser);
-  const { sendRequest, loading, data, error, Spinner } = useFetch();
+let initialOptions = {
+  diets: [],
+  categories: [],
+  measuringUnits: [],
+};
 
-  // STATES
-  const [values, setValues] = useState({
-    title: "",
-    source: "",
-    source_url: "",
-    image_url: null,
-    description: "",
-    dietsSelected: [],
-    categoriesSelected: [],
-    ingredients: [],
-    instructions: [],
-    cook: 0,
-    servings: 0,
-  });
+let initialErrors = {
+  title: "",
+  source_url: "",
+  file: "",
+  ingredients: "",
+  instructions: "",
+  general: "",
+};
 
-  const [errors, setErrors] = useState({
-    title: "",
-    source_url: "",
-    file: "",
-    ingredients: "",
-    instructions: "",
-    general: "",
-  });
-
-  const [options, setOptions] = useState({
-    measuringUnits: [],
-    diets: [],
-    categories: [],
-  });
-
-  // INITIAL SETTINGS
+// Caching: store data in localStorage instead of fetching the API everytime.
+const getOptions = async () => {
   const getOptionsAsync = async () => {
     const options = await Promise.all(
       [await getMeasuringUnits(), await getDiets(), await getCategories()].map((option) => option.data)
     );
-
-    setOptions({
+    const optionsObject = {
       measuringUnits: options[0],
       diets: options[1],
       categories: options[2],
-    });
+    };
+    localStorage.setItem("options", JSON.stringify(optionsObject));
   };
+
+  if (!localStorage.getItem("options")) await getOptionsAsync();
+  return JSON.parse(localStorage.getItem("options"));
+};
+
+const RecipeForm = () => {
+  const location = useLocation();
+  const params = useParams();
+  // const { _id:{$oid:user_id} } = useSelector((state) => state.activeUser);
+  // const { id } = useSelector((state) => state.activeUser);
+  const { sendRequest, loading, data, status, error, Spinner } = useFetch();
+
+  // STATES
+
+  const [values, setValues] = useState(initialValues);
+  const [options, setOptions] = useState(initialOptions);
+  const [errors, setErrors] = useState(initialErrors);
 
   const getRecipeAsync = async () => {
     // Sets values to data from server
     const { recipeId } = params;
     let { data } = await getRecipe(recipeId);
 
-    // data.dietsSelected = data.dietsSelected.map((diet) => diet.id??diet.diet_id);
-    // data.categoriesSelected = data.categoriesSelected.map((category) => category.id??category.category_id);
-    // data.ingredients = JSON.parse(data.ingredients)
-    // data.instructions = JSON.parse(data.instructions)
-
     // Add deleted items props, will be used to delete them from db
-    // data.ingredientsDeleted = [];
-    // data.instructionsDeleted = [];
+    data.ingredientsDeleted = [];
+    data.instructionsDeleted = [];
     setValues(data);
   };
 
   useEffect(() => {
-    getOptionsAsync();
     if (location.pathname.includes("/edit-recipe")) {
-      return getRecipeAsync();
+      getRecipeAsync();
     } else {
-      return setValues({ user_id, ...initialValues });
+      setValues({ /*user_id, */ ...initialValues });
     }
   }, [location]);
+
+  useEffect(() => {
+    (async () => {
+      const options = await getOptions();
+      setOptions({ ...options });
+    })();
+
+    return () => {
+      setValues({ ...initialValues });
+      setErrors({ ...initialErrors });
+    };
+  }, []);
 
   // FUNCTIONALITY
 
@@ -120,9 +123,9 @@ const RecipeForm = () => {
     setValues({ ...values, [name]: value });
   };
 
-  const handleCheck = ({ target: { name, checked, id,value } }) => {
+  const handleCheck = ({ target: { name, checked, id, value } }) => {
     if (checked) {
-      values[name].push({id:+id, title:value});
+      values[name].push({ id: +id, title: value });
     } else {
       values[name] = values[name].filter((item) => item.title !== value);
     }
@@ -154,11 +157,9 @@ const RecipeForm = () => {
     setValues({ ...values });
   };
 
-  const addImage = (image_url) => {
-    setValues({ ...values, image_url });
+  const setImagesInFormState = (images) => {
+    setValues({ ...values, images });
   };
-
-  const removeImage = () => setValues({ ...values, image_url: null });
 
   const scrollToError = (e) => {
     // Toggle class  'show' where error has occured to enable scrolling
@@ -179,6 +180,7 @@ const RecipeForm = () => {
       validationsAPI.ingredients(ingredients);
       validationsAPI.instructions(instructions);
       if (source_url) validationsAPI.url(source_url);
+      setErrors(initialErrors)
       return true;
     } catch (e) {
       setErrors({ [e.field]: e.message });
@@ -190,13 +192,8 @@ const RecipeForm = () => {
 
   const valuesToFormData = () => {
     const formData = new FormData();
-    for (const value in values) {
-      if (values[value] instanceof Object && value !== "image_url") {
-        formData.append(value, JSON.stringify(values[value]));
-      } else {
-        formData.append(value, values[value]);
-      }
-    }
+    for (const image of values.images) formData.append("images", image);
+    for (const key in values) if (key !== "images") formData.append(key, JSON.stringify(values[key]));
     return formData;
   };
 
@@ -204,10 +201,11 @@ const RecipeForm = () => {
     e.preventDefault();
     try {
       if (validateForm()) {
+        setErrors(initialErrors);
         const formData = valuesToFormData();
 
         if (location.pathname === "/add-recipe") {
-          await sendRequest(addRecipe, formData);
+          await addRecipe(formData);
         } else {
           await sendRequest(editRecipe, formData);
         }
@@ -433,19 +431,17 @@ const RecipeForm = () => {
           <div id="collapseFive" className="collapse" aria-labelledby="headingFive">
             <div className="card-body">
               <ImageUpload
-                addImage={addImage}
-                removeImage={removeImage}
-                image_url={values.image_url}
-                errors={errors.image_url}
+                setImagesInFormState={setImagesInFormState}
+                images={values.images}
+                errors={errors.images}
               />
             </div>
           </div>
         </div>
       </div>
-
       {loading ? (
         <Spinner />
-      ) : data ? (
+      ) : status === 200 ? (
         <CheckCircleSuccess message="Recipe was added successfully" />
       ) : (
         <CustomButton type="submit">

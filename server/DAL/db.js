@@ -17,7 +17,7 @@ const usersAPI = {
         [email, username, password]
       );
     } catch (e) {
-      if (e.errno === 1062) throw Error ("User already exists. Try different email address.");
+      if (e.errno === 1062) throw Error("User already exists. Try different email address.");
       return e;
     }
   },
@@ -48,7 +48,18 @@ const usersAPI = {
 const recipesAPI = {
   async getRecipes() {
     try {
-      return ([result] = await promisePool.execute(`SELECT * FROM recipesapp.recipes;`));
+      // return ([result] = await promisePool.execute(`SELECT * FROM recipesapp.recipes;`));
+      const [result] = await promisePool.execute(
+        `
+        SELECT r.*,
+        GROUP_CONCAT(i.url ORDER BY i.id) urls
+        FROM recipes r LEFT JOIN images i
+        ON i.recipe_id = r.id
+        GROUP BY r.id
+        ;`
+      );
+
+      return [result];
     } catch (e) {
       return e;
     }
@@ -67,9 +78,15 @@ const recipesAPI = {
 
   async getRecipe(recipeId) {
     try {
-      const [result] = await promisePool.execute("SELECT * FROM recipesapp.recipes WHERE (id = ?);", [
-        recipeId,
-      ]);
+      const [result] = await promisePool.execute(
+        "SELECT r.*, \
+        GROUP_CONCAT(i.url ORDER BY i.id) urls \
+        FROM recipes r LEFT JOIN images i \
+        ON i.recipe_id = r.id \
+        Where r.id = ? \
+        GROUP BY r.id;",
+        [recipeId]
+      );
       return result[0];
     } catch (e) {
       return e;
@@ -136,6 +153,20 @@ const recipesAPI = {
     }
   },
 
+  async getImagesForRecipe(recipeId) {
+    try {
+      const [result] = await promisePool.execute(
+        "SELECT url \
+        FROM recipesapp.images \
+        WHERE recipe_id= ? ;",
+        [recipeId]
+      );
+      return result.map((url) => url.url);
+    } catch (err) {
+      return [err];
+    }
+  },
+
   async getCategories() {
     try {
       return await promisePool.execute(`SELECT * FROM recipesapp.categories;`);
@@ -160,22 +191,13 @@ const recipesAPI = {
     }
   },
 
-  async createRecipe(
-    user_id,
-    title,
-    description,
-    source = null,
-    source_url = null,
-    servings,
-    cook,
-    image = null
-  ) {
+  async createRecipe(user_id, title, description, source = null, source_url = null, servings, cook) {
     try {
       return ([result] = await promisePool.execute(
         "INSERT INTO recipesapp.recipes \
-        (user_id, title, description, source, source_url, servings, cook, image_url)\
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
-        [user_id, title, description, source, source_url, servings, cook, image]
+        (user_id, title, description, source, source_url, servings, cook)\
+         VALUES (?, ?, ?, ?, ?, ?, ?);",
+        [user_id, title, description, source, source_url, servings, cook]
       ));
     } catch (e) {
       return e;
@@ -184,15 +206,18 @@ const recipesAPI = {
 
   async addIngredients(recipeId, ingredients) {
     try {
+      const result = [];
       ingredients.forEach((ingredient) => {
         const { id, text, amount, unitId } = ingredient;
-        promisePool.execute(
+        const [queryResult] = promisePool.execute(
           "INSERT IGNORE INTO recipesapp.ingredients\
          ( id, recipe_id, text , amount, unit_id)\
           VALUES (?,?,?,?,?)",
           [id ?? null, recipeId, text, amount, unitId]
         );
+        result.push(queryResult);
       });
+      return result;
     } catch (e) {
       return [e];
     }
@@ -200,14 +225,17 @@ const recipesAPI = {
 
   async addInstructions(recipeId, instructions) {
     try {
-      instructions.forEach((instruction) => {
-        promisePool.execute(
+      const result = [];
+      instructions.forEach(async (instruction) => {
+        const queryResult = await promisePool.execute(
           "INSERT IGNORE INTO recipesapp.instructions\
           (id, recipe_id, text)\
           VALUES (?,?,?)",
           [instruction.id ?? null, recipeId, instruction.text]
         );
+        result.push(queryResult);
       });
+      return result;
     } catch (e) {
       return [e];
     }
@@ -215,14 +243,18 @@ const recipesAPI = {
 
   async addDiets(recipeId, diets) {
     try {
-      diets.forEach((dietId) => {
-        promisePool.execute(
+      const result = [];
+
+      await diets.forEach(async (diet) => {
+        const queryResult = await promisePool.execute(
           "INSERT INTO recipesapp.recipes_diets\
           (recipe_id, diet_id)\
           VALUES (?,?)",
-          [recipeId, dietId]
+          [recipeId, diet]
         );
+        result.push(queryResult);
       });
+      return result;
     } catch (e) {
       return [e];
     }
@@ -230,22 +262,45 @@ const recipesAPI = {
 
   async addCategories(recipeId, categories) {
     try {
-      categories.forEach((categoryId) => {
-        promisePool.execute(
+      const result = [];
+      categories.forEach(async (categoryId) => {
+        const queryResult = await promisePool.execute(
           "INSERT INTO recipesapp.recipes_categories\
           (recipe_id, category_id)\
           VALUES (?,?)",
           [recipeId, categoryId]
         );
+        result.push(queryResult);
       });
+      return result;
     } catch (e) {
       return [e];
     }
   },
 
+  async addImages(recipeId, imageURLs) {
+    try {
+      const result = [];
+      imageURLs.forEach(async (url) => {
+        const queryResult = await promisePool.execute(
+          "INSERT INTO recipesapp.images\
+          (recipe_id, url)\
+          VALUES (?,?)",
+          [recipeId, url]
+        );
+        result.push(queryResult);
+      });
+      return result;
+    } catch (err) {
+      return [err];
+    }
+  },
+
   async deleteDiets(recipeId) {
     try {
-      promisePool.execute("DELETE FROM recipesapp.recipes_diets WHERE recipe_id = ?", [recipeId]);
+      return await promisePool.execute("DELETE FROM recipesapp.recipes_diets WHERE recipe_id = ?", [
+        recipeId,
+      ]);
     } catch (e) {
       return e;
     }
@@ -253,7 +308,9 @@ const recipesAPI = {
 
   async deleteCategories(recipeId) {
     try {
-      promisePool.execute("DELETE FROM recipesapp.recipes_categories WHERE recipe_id = ?", [recipeId]);
+      return await promisePool.execute("DELETE FROM recipesapp.recipes_categories WHERE recipe_id = ?", [
+        recipeId,
+      ]);
     } catch (e) {
       return e;
     }
@@ -261,7 +318,7 @@ const recipesAPI = {
 
   async deleteIngredients(ingredientId) {
     try {
-      promisePool.execute("DELETE FROM recipesapp.ingredients WHERE id = ? ;", [ingredientId]);
+      return await promisePool.execute("DELETE FROM recipesapp.ingredients WHERE id = ? ;", [ingredientId]);
     } catch (e) {
       return e;
     }
@@ -275,22 +332,21 @@ const recipesAPI = {
     }
   },
 
-  async updateRecipe(recipeId, title, description, source, url, servings, cook, image_url) {
+  async deleteImages(recipeId) {
+    try {
+      return await promisePool.execute("DELETE FROM recipesapp.images WHERE recipe_id = ? ;", [recipeId]);
+    } catch (err) {
+      return err;
+    }
+  },
+
+  async updateRecipe(recipeId, title, description, source, url, servings, cook) {
     try {
       return ([result] = await promisePool.execute(
         "UPDATE recipesapp.recipes SET \
-        title = ?, description =? , source=?, source_url=?, servings=?, cook=? , image_url = ? \
+        title = ?, description =? , source=?, source_url=?, servings=?, cook=?  \
         WHERE id = ?",
-        [
-          title,
-          description,
-          source ?? null,
-          url ?? null,
-          servings ?? null,
-          cook ?? null,
-          image_url ?? null,
-          recipeId,
-        ]
+        [title, description, source ?? null, url ?? null, servings ?? null, cook ?? null, recipeId]
       ));
     } catch (e) {
       return e;
@@ -311,7 +367,16 @@ const recipesAPI = {
 
   async getMyRecipes(id) {
     try {
-      return ([result] = await promisePool.execute("SELECT * FROM recipesapp.recipes WHERE user_id=?", [id]));
+      return ([result] = await promisePool.execute(
+        `
+        SELECT r.*, 
+        i.url urls
+        FROM recipes r LEFT JOIN images i
+        ON i.recipe_id = r.id
+        Where r.user_id = ?
+        GROUP BY r.id;`,
+        [id]
+      ));
     } catch (e) {
       return e;
     }

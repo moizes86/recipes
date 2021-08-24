@@ -1,5 +1,5 @@
 import axios from "axios";
-import { httpGet, httpPost, httpPut } from "../CRUD_Service";
+import { httpDelete, httpGet, httpPost, httpPut } from "../CRUD_Service";
 
 const url = "http://localhost:3100/recipes";
 
@@ -61,7 +61,7 @@ export const uploadImage = async (image) => {
 };
 
 export const deleteRecipe = async (recipeId) => {
-  return axios.delete(`${url}/delete?recipeId=${recipeId}`);
+  return httpDelete(`${url}/recipe?recipeId=${recipeId}`);
 };
 
 // / / / / / / / / / / / / / / / / //

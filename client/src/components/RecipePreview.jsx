@@ -11,7 +11,7 @@ const RecipePreview = ({ data: { id, _id /*:{$oid: _id}*/, title, urls, descript
         <span className="link" onClick={() => history.push(`/recipes/${id ?? _id}/${title}`)}>
           <img
             // src={`${process.env.REACT_APP_SERVER_PATH_FLASK}/${image_url}`}
-            src={`${process.env.REACT_APP_SERVER_PATH}/${urls.split(',')[0]}`}
+            src={`${process.env.REACT_APP_SERVER_PATH}/${urls?.split(',')[0]}`}
             alt=""
           />
           <span className="overlay-box">

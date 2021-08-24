@@ -251,7 +251,7 @@ i:hover {
   letter-spacing: $letter-spacing-soft;
 
   @media #{$break_md},#{$break_lg} {
-    margin-top: -80px;
+    // margin-top: -80px;
   }
 }
 

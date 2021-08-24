@@ -205,7 +205,7 @@ const RecipeForm = () => {
         const formData = valuesToFormData();
 
         if (location.pathname === "/add-recipe") {
-          await addRecipe(formData);
+          await sendRequest(addRecipe, formData);
         } else {
           await sendRequest(editRecipe, formData);
         }

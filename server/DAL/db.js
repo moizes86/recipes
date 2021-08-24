@@ -296,6 +296,23 @@ const recipesAPI = {
     }
   },
 
+  async deleteRecipe(recipeId) {
+    try {
+      return await promisePool.execute(
+        "Delete recipes, instructions, ingredients, recipes_categories, recipes_diets \
+          From recipes \
+          Left Join instructions  on instructions.recipe_id  = ? \
+          Left  Join ingredients on ingredients.recipe_id = ? \
+          Left Join recipes_categories On recipes_categories.recipe_id = ? \
+          Left Join recipes_diets On recipes_diets.recipe_id = ? \
+          Where recipes.id = ?;",
+        [recipeId, recipeId, recipeId, recipeId, recipeId]
+      );
+    } catch (err) {
+      return [err];
+    }
+  },
+
   async deleteDiets(recipeId) {
     try {
       return await promisePool.execute("DELETE FROM recipesapp.recipes_diets WHERE recipe_id = ?", [

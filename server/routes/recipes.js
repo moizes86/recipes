@@ -135,6 +135,16 @@ router.get("/recipe?:recipeId", async (req, res) => {
   }
 });
 
+router.delete("/recipe?:recipeId", async (req, res) => {
+  try {
+    const { recipeId } = req.query;
+    await recipesAPI.deleteRecipe(+recipeId);
+    res.status(200).send("Recipe deleted");
+  } catch (err) {
+    res.status(400).send("Problem deleting recipe");
+  }
+});
+
 router.get("/measuring-units", async (req, res) => {
   try {
     const [result] = await recipesAPI.getMeasuringUnits();
@@ -219,13 +229,15 @@ router.put("/edit-recipe", upload.array("images"), jsonifyData, validateData, as
     );
 
     // Images
-    await recipesAPI.deleteImages(recipe_id);
-    await recipesAPI.addImages(
-      recipe_id,
-      req.files.map((file) => file.path)
-    );
+    if (req.files.length) {
+      await recipesAPI.deleteImages(recipe_id);
+      await recipesAPI.addImages(
+        recipe_id,
+        req.files.map((file) => file.path)
+      );
 
-    urls?.split(",").forEach((url) => fs.unlink(url, (err, result) => {}));
+      urls?.split(",").forEach((url) => fs.unlink(url, (err, result) => {}));
+    }
 
     res.status(200).send("OK");
   } catch (e) {

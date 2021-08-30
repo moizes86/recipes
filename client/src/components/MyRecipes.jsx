@@ -25,10 +25,10 @@ const MyRecipes = () => {
   return (
     <div className="my-recipes">
       <h3 className="text-center mb-4">My Recipes</h3>
-      <table className="table">
-        {loading ? (
-          <Spinner />
-        ) : (
+      {loading ? (
+        <Spinner />
+      ) : (
+        <table className="table">
           <tbody>
             {recipes.map((recipe, i) => (
               <tr
@@ -45,18 +45,16 @@ const MyRecipes = () => {
                     className="far fa-trash-alt"
                     onClick={async (e) => {
                       e.stopPropagation();
-                      // deleteRecipe(recipe._id["$oid"]);
                       await sendRequest(deleteRecipe, recipe.id);
                       getMyRecipesAsync();
-
                     }}
                   ></i>
                 </td>
               </tr>
             ))}
           </tbody>
-        )}
-      </table>
+        </table>
+      )}
     </div>
   );
 };

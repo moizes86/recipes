@@ -5,7 +5,7 @@ export const httpService = (method, url, data) => {
     method: method,
     url: url,
     data,
-    headers: { "Access-Control-Allow-Origin": "http://localhost:5000" },
+    headers: { "Access-Control-Allow-Origin": "http://localhost:3100" },
     withCredentials: true,
   });
 };

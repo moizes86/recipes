@@ -250,7 +250,7 @@ const recipesAPI = {
           "INSERT INTO recipesapp.recipes_diets\
           (recipe_id, diet_id)\
           VALUES (?,?)",
-          [recipeId, diet]
+          [recipeId, diet.id]
         );
         result.push(queryResult);
       });
@@ -263,12 +263,12 @@ const recipesAPI = {
   async addCategories(recipeId, categories) {
     try {
       const result = [];
-      categories.forEach(async (categoryId) => {
+      categories.forEach(async (category) => {
         const queryResult = await promisePool.execute(
           "INSERT INTO recipesapp.recipes_categories\
           (recipe_id, category_id)\
           VALUES (?,?)",
-          [recipeId, categoryId]
+          [recipeId, category.id]
         );
         result.push(queryResult);
       });
@@ -298,16 +298,9 @@ const recipesAPI = {
 
   async deleteRecipe(recipeId) {
     try {
-      return await promisePool.execute(
-        "Delete recipes, instructions, ingredients, recipes_categories, recipes_diets \
-          From recipes \
-          Left Join instructions  on instructions.recipe_id  = ? \
-          Left  Join ingredients on ingredients.recipe_id = ? \
-          Left Join recipes_categories On recipes_categories.recipe_id = ? \
-          Left Join recipes_diets On recipes_diets.recipe_id = ? \
-          Where recipes.id = ?;",
-        [recipeId, recipeId, recipeId, recipeId, recipeId]
-      );
+      const imageUrls = await promisePool.execute("SELECT url FROM recipesapp.images WHERE recipe_id = ?;", [recipeId]);
+      await promisePool.execute("DELETE FROM Recipes WHERE Recipes.id = ?;", [recipeId]);
+      return imageUrls
     } catch (err) {
       return [err];
     }
@@ -315,7 +308,7 @@ const recipesAPI = {
 
   async deleteDiets(recipeId) {
     try {
-      return await promisePool.execute("DELETE FROM recipesapp.recipes_diets WHERE recipe_id = ?", [
+      return await promisePool.execute("DELETE FROM recipesapp.recipes_diets WHERE recipe_id = ?;", [
         recipeId,
       ]);
     } catch (e) {
@@ -325,7 +318,7 @@ const recipesAPI = {
 
   async deleteCategories(recipeId) {
     try {
-      return await promisePool.execute("DELETE FROM recipesapp.recipes_categories WHERE recipe_id = ?", [
+      return await promisePool.execute("DELETE FROM recipesapp.recipes_categories WHERE recipe_id = ?;", [
         recipeId,
       ]);
     } catch (e) {
@@ -343,7 +336,7 @@ const recipesAPI = {
 
   async deleteInstructions(instructionId) {
     try {
-      promisePool.execute("DELETE FROM recipesapp.instructions WHERE id = ? ;", [instructionId]);
+      promisePool.execute("DELETE FROM recipesapp.instructions WHERE id = ?;", [instructionId]);
     } catch (e) {
       return e;
     }
@@ -351,7 +344,7 @@ const recipesAPI = {
 
   async deleteImages(recipeId) {
     try {
-      return await promisePool.execute("DELETE FROM recipesapp.images WHERE recipe_id = ? ;", [recipeId]);
+      return await promisePool.execute("DELETE FROM recipesapp.images WHERE recipe_id = ?;", [recipeId]);
     } catch (err) {
       return err;
     }

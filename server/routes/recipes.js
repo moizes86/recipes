@@ -83,7 +83,6 @@ const createRecipeInDB = async (req, res, next) => {
     );
 
     const newRecipeId = resultCreateRecipe.insertId;
-
     await recipesAPI.addIngredients(newRecipeId, ingredients);
     await recipesAPI.addInstructions(newRecipeId, instructions);
     await recipesAPI.addDiets(newRecipeId, dietsSelected);
@@ -138,9 +137,20 @@ router.get("/recipe?:recipeId", async (req, res) => {
 router.delete("/recipe?:recipeId", async (req, res) => {
   try {
     const { recipeId } = req.query;
-    await recipesAPI.deleteRecipe(+recipeId);
+
+    //returns image urls
+    const imageUrls = await recipesAPI.deleteRecipe(+recipeId);
+    imageUrls[0]
+      .map((el) => el.url)
+      .forEach((url) =>
+        fs.unlink(url, (err, result) => {
+          if (err) return err;
+        })
+      );
+
     res.status(200).send("Recipe deleted");
   } catch (err) {
+    debugger;
     res.status(400).send("Problem deleting recipe");
   }
 });
@@ -214,19 +224,12 @@ router.put("/edit-recipe", upload.array("images"), jsonifyData, validateData, as
     await recipesAPI.addInstructions(recipe_id, instructions);
 
     // Diets
-
     await recipesAPI.deleteDiets(recipe_id);
-    await recipesAPI.addDiets(
-      recipe_id,
-      dietsSelected.map((diet) => diet.id)
-    );
+    await recipesAPI.addDiets(recipe_id, dietsSelected);
 
     // Categories
     await recipesAPI.deleteCategories(recipe_id);
-    await recipesAPI.addCategories(
-      recipe_id,
-      categoriesSelected.map((category) => category.id)
-    );
+    await recipesAPI.addCategories(recipe_id, categoriesSelected);
 
     // Images
     if (req.files.length) {

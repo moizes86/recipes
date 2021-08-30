@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { deleteRecipe, getMyRecipes } from "../services/API_Services/RecipeAPI";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
@@ -13,12 +13,13 @@ const MyRecipes = () => {
   } = useSelector((state) => state.activeUser);
   const history = useHistory();
 
-  const { sendRequest, loading, data, status, error, Spinner } = useFetch();
+  const { sendRequest, loading, Spinner } = useFetch();
 
   const getMyRecipesAsync = async () => {
     const result = await getMyRecipes(id /*??_id*/);
-    setRecipes(result.data);
+    return setRecipes(result.data);
   };
+
   useEffect(() => {
     getMyRecipesAsync();
   }, []);

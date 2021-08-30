@@ -103,6 +103,8 @@ const RecipeForm = () => {
     } else {
       setValues({ /*user_id, */ ...initialValues });
     }
+
+    return()=>setValues({ ...initialValues });
   }, [location]);
 
   useEffect(() => {

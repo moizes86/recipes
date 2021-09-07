@@ -1,7 +1,6 @@
-import axios from "axios";
 import { httpDelete, httpGet, httpPost, httpPut } from "../CRUD_Service";
 
-const url = "http://localhost:3100/recipes";
+const url = "https://recipes-db-mm.herokuapp.com/recipes";
 
 export const getRecipes = async () => {
   return await httpGet(url);
